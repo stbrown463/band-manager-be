@@ -1,4 +1,4 @@
-# Band Manager App
+# Band Manager API
 
 ## MVP SQL Models
 
@@ -81,16 +81,38 @@
 	active = BooleanField()
 ```
 
-### MemberOf
+### BandMember
 ```python
 	userId = ForeignKeyField(User)
 	bandId = ForeignKeyField(Band)
-	genreId = ForeignKeyField(Genre)
-	conatactId = ForeignKeyField(Contact)
-	roleId = ForeignKeyField(Role)
-	showId = ForeignKeyField(Show)
-	venueId = ForeignKeyField(Venue)
 	active = BooleanField()
+```
+
+### BandGenre
+```python
+	bandId = ForeignKeyField(Band)
+	genreId = ForeignKeyField(Genre)
+```
+
+### BandShow
+```python
+	bandId = ForeignKeyField(Band)
+	showId = ForeignKeyField(Show)
+```
+
+### ContactRole
+```python
+	conatactId = ForeignKeyField(Contact)
+	userId = ForeignKeyField(Contact)
+	roleId = ForeignKeyField(Role)
+```
+
+### VenueContact
+```python
+	userId = ForeignKeyField(User)
+	conatactId = ForeignKeyField(Contact)
+ 	venueId = ForeignKeyField(Venue)
+ 	active = BooleanField()
 ```
 
 ## Routes
@@ -171,7 +193,46 @@
 	Delete member of 
 ```
 
+### BandMember
+```
+	Add member of band
+	View members of band
+	edit active status
+	Delete member of band == admin or user added
+```
 
+### BandGenre
+```
+	Add genre of band
+	Delete genre of band
+	View genres of band
+```
+
+### BandShow
+```
+	Add band of show
+	Delete band from show == show creator or band member
+	View bands of show
+
+```
+
+### ContractRole
+```
+	
+```
+
+### ContactRole
+```python
+	conatactId = ForeignKeyField(Contact)
+	roleId = ForeignKeyField(Role)
+```
+
+### VenueContact
+```python
+	userId = ForeignKeyField(User)
+	conatactId = ForeignKeyField(Contact)
+ 	venueId = ForeignKeyField(Venue)
+ 	active = BooleanField()
 
 
 
