@@ -149,8 +149,6 @@
 	Register
 	Login
 	Edit info
-	Add Band Contact
-	Add Band memberOf
 	Delete User
 ```
 
@@ -158,14 +156,92 @@
 ```
 	Create Band
 	Edit Band Info
+	View Band
+	Delete Band -- only if confirmed member of band, and entry is duplicate or errant
 	Confirm User As Member
+	Email Band
+```
+
+### Show
+```
+	Create Show
+	View Show
+	Edit Show 
+	Delete Show
+	Email Booker
+```
+
+### Contact
+```
+	Create contact
+	View contact
+	Edit contact 
+	Delete Contact
+	Email contact
+```
+
+### Venue
+```
+	Create venue
+	View venue
+	edit venue 
+	delete venue -- only if confirmed contact of venue
 ```
 
 ### BandShow
 ```
 	Add Band to Show
+	Remove Band From show -- only before show date
 ```
 
+### Band Member
+```
+	Add user as member of band
+	View members of band
+	Delete user as member of band
+```
 
+### Band Shows
+```
+	Add band to show
+	Remove band from show
+	View bands of show
+```
+
+### BandVenues
+```
+	Add Venue-Band connection with notes and times connected logged
+	Edit Venue-Band notes or connection count
+	View notes
+	View venues sorted by connection count
+```
+
+### BandContact
+```
+	Add Connection
+	Edit connection count
+	view connection notes and count
+```
+
+### VenueContact
+```
+	Add contact as contact of venue
+	Remove contact as contact of venue
+	Edit active value
+```
+
+### ShowContact
+```
+	Add contact as contact of show
+	Remove contact as contact of show
+	View contact of show
+```
+
+### ShowVenue
+```
+	Add venue as venue of show
+	remove venue as venue of show
+	view venue of show
+```
 
 
