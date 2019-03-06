@@ -83,6 +83,17 @@ class Band(Resource):
 			return (marshal(band, band_fields), 200)
 		except models.Band.DoesNotExist:
 			return ('band not found', 404)
+
+	# Delete Band -- only if user is confirmed member of band, 
+	def delete(self, b_id):
+		query = models.Band.delete().where(models.Band.id==b_id)
+		query.execute()
+		return 200
+
+
+
+
+
 			
 class BandEdit(Resource):
 	def __init__(self):
@@ -125,6 +136,7 @@ class BandEdit(Resource):
 	  )	  
 	  super().__init__()
 
+	# Edit Band Info
 	def put(self, b_id):
 		try:
 			args = self.reqparse.parse_args()
@@ -137,8 +149,12 @@ class BandEdit(Resource):
 			return ('band not found', 404)
 
 
-	# Edit Band Info
-	# Delete Band -- only if user is confirmed member of band, 
+
+
+
+
+
+
 	# 	and entry is duplicate or errant
 	# Confirm User As Member
 	# Email Band
