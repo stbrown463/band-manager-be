@@ -23,7 +23,6 @@
 	email = CharField()
 	city = CharField()
 	country = CharField()
-	genres = CharField()
 	website = CharField()
 ```
 
@@ -58,88 +57,40 @@
 	website = CharField()
 ```
 
-## MVP SQL Through Tables
-
-### BandMember
+### Genre
 ```python
-	bandId = ForeignKeyField(Band)
+	name = CharField()
+```
+
+### Role
+```python
+	name = CharField()
+```
+
+## MVP Throughtables
+
+### Connection
+```python
+	mybandId = ForeignKeyField(Band)
+	otherbandId = ForeignKeyField(Band)
 	userId = ForeignKeyField(User)
-```
-
-### BandShows
-```python
-	bandId = ForeignKeyField(Band)
-	showId = ForeignKeyField(Show)
-```
-
-### BandVenues
-```python
-	BandId = ForeignKeyField(Band)
-	venueId = ForeignKeyField(Venue)
-	notes = CharField()
-	timesConnected = IntegerField()
-```
-
-### BandToBand
-```python
-	myBand = ForeignKeyField(Band)
-	theirBand = ForeignKeyField(Band)
-	notes = CharField()
-	timesConnected = IntegerField()
-```
-
-### BandToContact
-```python
-	bandId = ForeignKeyField(Band)
-	contactId = ForeignKeyField(Contact)
-	timesConnected = IntegerField()
-	connectionType = CharField()
-```
-
-### VenueContact
-```python
 	venueId = ForeignKeyField(Venue)
 	contactId = ForeignKeyField(Contact)
+	notes = CharField()
+	timesConnected = IntegerField()
 	active = BooleanField()
 ```
 
-### ShowContact
+### MemberOf
 ```python
-	showId = ForeignKeyField(Show)
-	contactId = ForeignKeyField(Contact)
-```
-
-### ShowVenue
-```python
+	userId = ForeignKeyField(User)
+	bandId = ForeignKeyField(Band)
+	genreId = ForeignKeyField(Genre)
+	conatactId = ForeignKeyField(Contact)
+	roleId = ForeignKeyField(Role)
 	showId = ForeignKeyField(Show)
 	venueId = ForeignKeyField(Venue)
-```
-
-## Stretch SQL Models
-
-### Tour
-```python
-	name = CharField()
-	startDate = DateField()
-	endDate = DateField()
-```
-### BandOnTour
-```python
-	bandId = ForeignKeyField(Band)
-	tourId = ForeignKeyField(Tour)
-```
-
-### TourShow
-```python
-	tourId = ForeignKeyField(Tour)
-	showId = ForeignKeyField(Show)
-```
-
-### Merch
-```python
-	product = CharField()
-	price = Charfield()
-	quantity = CharField()
+	active = BooleanField()
 ```
 
 ## Routes
@@ -157,9 +108,11 @@
 	Create Band
 	Edit Band Info
 	View Band
-	Delete Band -- only if confirmed member of band, and entry is duplicate or errant
+	Delete Band -- only if user is confirmed member of band, 
+		and entry is duplicate or errant
 	Confirm User As Member
 	Email Band
+	Search Bands
 ```
 
 ### Show
@@ -169,6 +122,7 @@
 	Edit Show 
 	Delete Show
 	Email Booker
+	Search Shows
 ```
 
 ### Contact
@@ -178,6 +132,7 @@
 	Edit contact 
 	Delete Contact
 	Email contact
+	Search Contacts
 ```
 
 ### Venue
@@ -186,62 +141,37 @@
 	View venue
 	edit venue 
 	delete venue -- only if confirmed contact of venue
+	Search Venue
 ```
 
-### BandShow
+### Genre
 ```
-	Add Band to Show
-	Remove Band From show -- only before show date
-```
-
-### Band Member
-```
-	Add user as member of band
-	View members of band
-	Delete user as member of band
+	Add genre
+	Search genres
+	Delete genre == admin only
 ```
 
-### Band Shows
+### Role
 ```
-	Add band to show
-	Remove band from show
-	View bands of show
-```
-
-### BandVenues
-```
-	Add Venue-Band connection with notes and times connected logged
-	Edit Venue-Band notes or connection count
-	View notes
-	View venues sorted by connection count
+	Add role 
+	Search roles
+	Delete role == admin only
 ```
 
-### BandContact
+### Connection
 ```
-	Add Connection
-	Edit connection count
-	view connection notes and count
-```
-
-### VenueContact
-```
-	Add contact as contact of venue
-	Remove contact as contact of venue
-	Edit active value
+	Create connection between two foreign key ids
+	Edit non Foreign Key values of connection
 ```
 
-### ShowContact
+### MemberOf
 ```
-	Add contact as contact of show
-	Remove contact as contact of show
-	View contact of show
+	Create connection between two foreign key ids -- with validation
+	Edit Active status
+	Delete member of 
 ```
 
-### ShowVenue
-```
-	Add venue as venue of show
-	remove venue as venue of show
-	view venue of show
-```
+
+
 
 
