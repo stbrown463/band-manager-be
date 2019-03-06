@@ -67,7 +67,7 @@
 	name = CharField()
 ```
 
-## MVP Throughtables
+## MVP Through Tables
 
 ### Connection
 ```python
