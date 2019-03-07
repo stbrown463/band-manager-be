@@ -18,7 +18,6 @@
 	name = CharField()
 	verified = Boolean()
 	img_url = CharField()
-	photo_url = CharField()	
 	primaryContact = ForeignKeyField(User)
 	email = CharField()
 	city = CharField()

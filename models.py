@@ -18,10 +18,18 @@ class Band(Model):
 	class Meta:
 		database = DATABASE
 
+class Genre(Model):
+	name = CharField()
 
+	class Meta:
+		database = DATABASE
 
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band], safe=True)
+	DATABASE.create_tables([Band, Genre], safe=True)
 	DATABASE.close()
+
+
+
+

@@ -152,18 +152,14 @@ class BandSearch(Resource):
 
 	def get(self):
 		if(request.args.get('city')):
-			print(request.args.get('city'))
 			city = request.args.get('city')
-			print(city, '== city')
 			bands = models.Band.select().where(models.Band.city ** f'%{city}%') 
 			if (bands):
 				return ([marshal(band, band_fields) for band in bands], 200)
 			else:
 				return 404
 		if(request.args.get('name')):
-			print(request.args.get('name'))
 			name = request.args.get('name')
-			print(name, '== name')
 			bands = models.Band.select().where(models.Band.name ** f'%{name}%') 
 			if (bands):
 				return ([marshal(band, band_fields) for band in bands], 200)
