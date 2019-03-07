@@ -199,16 +199,31 @@ class BandGenreNew(Resource):
 	def post(self):
 		args = self.reqparse.parse_args()
 		print(args, 'hittingggg ')
+		bandgenre = models.BandGenre.get_or_create(**args)
+		print(bandgenre[1])
+		if bandgenre[1]:
+			return (marshal(bandgenre[0], band_genre_fields), 200)
+		else: 
+			return (marshal(bandgenre[0], band_genre_fields), 403)
 
-		## search BandGenre for band_id and genre_id
-		## if found, don't create, return 403, forbidden
+		
+		# try:
+		# 	## search BandGenre for band_id and genre_id
+		# 	band_genre_exists = models.BandGenre.select().where(
+		# 		models.BandGenre.band_id == args["band_id"] and 
+		# 		models.BandGenre.genre_id == args["genre_id"])
 
-		## if not create vvv
+		# 	print(band_genre_exists.__data__)
+		# 	return 200
+
+		# 	# if not band_genre_exists:
+		# 	# else: 
+		# 	# 	## if band_genre_exists return 403 forbidden
+		# 	# 	abort(403)
+		# except models.BandGenre.DoesNotExist:
+		# 	abort(404)
 
 
-		bandgenre = models.BandGenre.create(**args)
-		print(bandgenre.__data__)
-		return marshal(bandgenre, band_genre_fields)
 
 class BandGenre(Resource):
 	def __init__(self):
@@ -223,8 +238,8 @@ class BandGenre(Resource):
 			for genre in genres:
 				print(genre.__dict__,'== band genres')
 			return ([marshal(genre, genre_fields) for genre in genres], 200)
-		except modles.BandGenre.DoesNotExist:
-			return 404
+		except models.BandGenre.DoesNotExist:
+			abort(404)
 
 
 
