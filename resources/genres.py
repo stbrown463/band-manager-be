@@ -68,15 +68,13 @@ class Genre(Resource):
 		else:
 			return 404
 
-	# Delete genre == admin only
+	# Delete genre == working without auth
 	def delete(self, g_id):
 		query = models.Genre.delete().where(models.Genre.id==g_id)
 		query.execute()
 		return 200
+		
 
-	# Add genre of band
-	# Delete genre of band
-	# View genres of band
 
 
 

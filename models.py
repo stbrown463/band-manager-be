@@ -24,10 +24,21 @@ class Genre(Model):
 	class Meta:
 		database = DATABASE
 
+### THROUGH TABLES
+
+class BandGenre(Model):
+	band_id = ForeignKeyField(Band)
+	genre_id = ForeignKeyField(Genre)
+
+	class Meta:
+		database = DATABASE
+
+
+
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre], safe=True)
 	DATABASE.close()
 
 
