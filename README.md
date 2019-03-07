@@ -4,7 +4,6 @@
 
 ### User
 ```python
-	id = IntegerField()
 	username = CharField()
 	password = CharField()
 	email = CharField()
@@ -33,6 +32,7 @@
 	guarantee = IntegerField()
 	notes = CharField()
 	poster_url = CharField()
+	venur = ForeignKeyField()
 ```
 
 ### Contact

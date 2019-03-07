@@ -1,8 +1,14 @@
 from flask_login import login_required
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, url_for
 from flask import jsonify, Blueprint, abort, request
+from playhouse.shortcuts import model_to_dict, dict_to_model
 
 import models
+
+import logging
+logger = logging.getLogger('peewee')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
 
 band_fields = {
 	'id': fields.Integer,
@@ -21,8 +27,11 @@ band_genre_fields = {
 }
 
 genre_fields = {
+	'id': fields.String,
 	'name': fields.String
 }
+
+
 
 
 class BandsNew(Resource):
@@ -195,7 +204,7 @@ class BandGenreNew(Resource):
 		  location=['form', 'json']
 		)
 
-	## add genre of band -- working, but dupliates allowed
+	## add genre of band -- Working as intentended
 	def post(self):
 		args = self.reqparse.parse_args()
 		print(args, 'hittingggg ')
@@ -206,50 +215,88 @@ class BandGenreNew(Resource):
 		else: 
 			return (marshal(bandgenre[0], band_genre_fields), 403)
 
-		
-		# try:
-		# 	## search BandGenre for band_id and genre_id
-		# 	band_genre_exists = models.BandGenre.select().where(
-		# 		models.BandGenre.band_id == args["band_id"] and 
-		# 		models.BandGenre.genre_id == args["genre_id"])
-
-		# 	print(band_genre_exists.__data__)
-		# 	return 200
-
-		# 	# if not band_genre_exists:
-		# 	# else: 
-		# 	# 	## if band_genre_exists return 403 forbidden
-		# 	# 	abort(403)
-		# except models.BandGenre.DoesNotExist:
-		# 	abort(404)
-
 
 
 class BandGenre(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## view genres of band -- untested.. need to get create working first
+	## view genres of band -- need to return bg_id too
 	def get(self, b_id):
 		print('hitting')
 		try:
-			genres = models.Genre.select().join(models.BandGenre, models.JOIN.LEFT_OUTER).where(
-				models.BandGenre.band_id == b_id)
+			# Genre = models.Genre
+			# BandGenre = models.BandGenre
+
+			# asdf = Genre.select(Genre.name, BandGenre.id).join(BandGenre, on=(BandGenre.genre_id == Genre.id)).where(BandGenre.band_id == b_id)
+
+			# for thing in asdf:
+			# 	print(thing)
+
+			## RAW SQL QUERY
+			# select genre.name, bandgenre.id from genre INNER JOIN bandgenre ON genre.id = bandgenre.genre_id WHERE bandgenre.band_id = 1;
+
+			G = models.Genre.alias()
+			BG = models.BandGenre.alias()
+
+			genres = G.select().join(BG).select(BG.id, G.name).where(BG.band_id == b_id)		## good enough for now... move
+
+
+
+# ('SELECT "t1"."id", "t2"."name" FROM "genre" AS "t2" INNER JOIN "bandgenre" AS "t1" ON ("t1"."genre_id" = "t2"."id") WHERE ("t1"."band_id" = ?)', [2])
+# {'__data__': {'name': 'rock'}, '_dirty': set(), '__rel__': {}, 'bandgenre': <BandGenre: 3>} == band genres
+# ('SELECT "t1"."id", "t1"."band_id", "t1"."genre_id" FROM "bandgenre" AS "t1" WHERE ("t1"."band_id" = ?)', [2])
+# ('SELECT "t1"."id", "t1"."name", "t1"."verified", "t1"."img_url", "t1"."email", "t1"."city", "t1"."country", "t1"."website" FROM "band" AS "t1" WHERE ("t1"."id" = ?) LIMIT ? OFFSET ?', [2, 1, 0])
+# ('SELECT "t1"."id", "t1"."name" FROM "genre" AS "t1" WHERE ("t1"."id" = ?) LIMIT ? OFFSET ?', [2, 1, 0])
+			# ids = BG.select().where(BG.band_id == b_id)
+
+
+
+
+			# q = genres & ids
+			# for e in q:
+			# 	print(e.__dict__, '== combined query')
+
+			# genres = models.Genre.select(models.Genre.name, models.BandGenre.id).join(models.BandGenre).where(
+			# 	models.BandGenre.band_id == b_id)
+
+			# bandgenres = models.BandGenre.select(models.BandGenre.id).where(models.BandGenre.band_id == b_id)
+
+			# query = genres | bandgenres
 			for genre in genres:
 				print(genre.__dict__,'== band genres')
+				print(type(genre.bandgenre))
+				print(genre.bandgenre)
+				print(model_to_dict(genre.bandgenre))
+				genre.id = model_to_dict(genre.bandgenre)["id"]
+				print(genre.__dict__)
+			# for genre in genres: 
+			# 	print(genre.name)
+			# 	print(genre.id)
+			# 	print(BG.id)
+			# return ([[marshal(genre, genre_fields) for genre in genres], [marshal(id, band_genre_fields) for id in ids]], 200)
 			return ([marshal(genre, genre_fields) for genre in genres], 200)
 		except models.BandGenre.DoesNotExist:
 			abort(404)
 
 
-
-		
-
-
 	
-	# Add genre of band
+class BandGenreDelete(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## delete genre of band -- no errors, not verified working though
+	def delete(self, bg_id):
+		band_genre_to_delete = models.BandGenre.get_or_none(models.BandGenre.id == bg_id)
+		if band_genre_to_delete:
+			models.BandGenre.delete().where(models.BandGenre.id == bg_id)
+			return ("band genre deleted", 200)
+		else:
+			abort(404)
+
+
 	# Delete genre of band
-	# View genres of band
+
 
 
 	# Confirm User As Member
@@ -300,6 +347,12 @@ api.add_resource(
 	BandGenre,
 	'/bands/genre/<int:b_id>',
 	endpoint="band_genre"
+	)
+
+api.add_resource(
+	BandGenreDelete,
+	'/bands/genre/<int:bg_id>/delete',
+	endpoint="band_genre_delete"
 	)
 
 
