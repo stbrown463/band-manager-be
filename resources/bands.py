@@ -1,6 +1,6 @@
 from flask_login import login_required
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, url_for
-from flask import jsonify, Blueprint, abort
+from flask import jsonify, Blueprint, abort, request
 
 import models
 
@@ -89,11 +89,6 @@ class Band(Resource):
 		query = models.Band.delete().where(models.Band.id==b_id)
 		query.execute()
 		return 200
-
-
-
-
-
 			
 class BandEdit(Resource):
 	def __init__(self):
@@ -148,17 +143,39 @@ class BandEdit(Resource):
 		except models.Band.DoesNotExist:
 			return ('band not found', 404)
 
-
-
-
-
-
-
-
-	# 	and entry is duplicate or errant
-	# Confirm User As Member
-	# Email Band
 	# Search Bands
+
+
+class BandSearch(Resource):
+	def __init__(self):
+		super().__init__()
+
+	def get(self):
+		if(request.args.get('city')):
+			print(request.args.get('city'))
+			city = request.args.get('city')
+			print(city, '== city')
+			bands = models.Band.select().where(models.Band.city ** f'%{city}%') 
+			if (bands):
+				return ([marshal(band, band_fields) for band in bands], 200)
+			else:
+				return 404
+		if(request.args.get('name')):
+			print(request.args.get('name'))
+			name = request.args.get('name')
+			print(name, '== name')
+			bands = models.Band.select().where(models.Band.name ** f'%{name}%') 
+			if (bands):
+				return ([marshal(band, band_fields) for band in bands], 200)
+			else:
+				return 404
+
+	# Confirm User As Member
+
+	# Email Bands
+	## probably on front end??
+
+
 
 
 bands_api = Blueprint('resources.bands', __name__)
@@ -188,6 +205,11 @@ api.add_resource(
 	endpoint="band_edit"
 	)
 
+api.add_resource(
+	BandSearch,
+	'/bands/search',
+	endpoint="band_search"
+	)
 
 
 
