@@ -41,17 +41,53 @@ class ContactsNew(Resource):
 	    location=['form', 'json']
 	  )
 
-	## Create New contact -- untested
+	## Create New contact -- working
 	@marshal_with(contact_fields) 
 	def post(self):
 		args = self.reqparse.parse_args()
 		print(args, 'hittingggg ')
 		contact = models.Contact.create(**args)
-		return contact
+		return (contact, 200)
+
+class ContactsList(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+
+	## Get All contacts === Working, admin only
+	def get(self):
+		contacts = [marshal(contact, contact_fields) for contact in models.Contact.select()]
+		return (contacts, 200)
+
+class Contact(Resource):
+	def __init__(self):
+		self.reqparse = reqparse.RequestParser()
+
+	# View contact -- untested
+	def get(self, c_id):
+		try: 
+			contact = models.Contact.get(models.Contact.id == c_id)
+			return (marshal(contact, contact_fields), 200)
+		except models.Contact.DoesNotExist:
+			return ('contact not found', 404)
+
+	# Delete contact -- untested admin only
+	def delete(self, c_id):
+		contact_to_delete = models.Contact.get_or_none(models.Contact.id == c_id)
+		if contact_to_delete:
+			contact_to_delete.delete_instance()
+			return ("contact deleted", 200)
+		else:
+			abort(404)
 
 
 
-
+	# Create contact -- done
+	# View all contacts -- done
+	# View contact
+	# Edit contact 
+	# Delete Contact
+	# Email contact
+	# Search Contacts
 
 
 
@@ -71,11 +107,11 @@ class ContactsNew(Resource):
 contacts_api = Blueprint('resources.contacts', __name__)
 api = Api(contacts_api)
 
-# api.add_resource(
-# 	ContactsList,
-# 	'/contacts',
-# 	endpoint="contacts"
-# 	)
+api.add_resource(
+	ContactsList,
+	'/contacts',
+	endpoint="contacts"
+	)
 
 api.add_resource(
 	ContactsNew,
@@ -83,11 +119,11 @@ api.add_resource(
 	endpoint="contacts_new"
 	)
 
-# api.add_resource(
-# 	Contact,
-# 	'/contacts/<int:c_id>',
-# 	endpoint="contact"
-# 	)
+api.add_resource(
+	Contact,
+	'/contacts/<int:c_id>',
+	endpoint="contact"
+	)
 
 # api.add_resource(
 # 	ContactEdit,
