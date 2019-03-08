@@ -43,7 +43,7 @@ class Band(Model):
 	name = CharField()
 	verified = BooleanField(null=True)
 	img_url = CharField()
-	# primaryContact = ForeignKeyField(User)
+	primaryContact = ForeignKeyField(User, null=True)
 	email = CharField()
 	city = CharField()
 	state = CharField()
@@ -108,12 +108,23 @@ class BandGenre(Model):
 	class Meta:
 		database = DATABASE
 
+class Connection(Model):
+	my_band_id = ForeignKeyField(Band)
+	other_band_id = ForeignKeyField(Band)
+	user_id = ForeignKeyField(User)
+	venue_id = ForeignKeyField(Venue)
+	contact_id = ForeignKeyField(Contact)
+	notes = CharField()
+	timesConnected = IntegerField(null=True, default=0)
+	active = BooleanField(default=True)
 
+	class Meta:
+		database = DATABASE
 
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User, Connection], safe=True)
 	DATABASE.close()
 
 
