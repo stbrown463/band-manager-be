@@ -6,8 +6,16 @@ from playhouse.shortcuts import model_to_dict, dict_to_model
 import json
 import models
 
-
 band_band_fields = {
+	'id': fields.Integer,
+	'my_band_id': fields.String,
+	'other_band_id': fields.String,
+	'notes': fields.String,
+	'timesConnected': fields.String,
+	'active': fields.Boolean
+}
+
+connection_fields = {
 	'c_id': fields.Integer,
 	'id': fields.String,
 	'name': fields.String,
@@ -87,32 +95,22 @@ class ConnectionBBNew(Resource):
 		else: 
 			return (marshal(connection[0], band_band_fields), 403)
 
+################# BAND TO BAND CONNECTIONS #######################################
 
 class ConnectionBB(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## view genres of band -- WORKING
+	## view connections of band -- WORKING -- should add querying for cities as well
 	def get(self, b_id):
 		print('hitting')
 		try:
-
 			B = models.Band.alias()
 			C = models.Connection.alias()
 
-
-			# on=(User.id == ActivityLog.object_id)
-			# genres = G.select().join(BG).select(BG.id, G.name).where(BG.band_id == b_id)
 			bands = B.select().join(C, on=(C.other_band_id == B.id)).select(B.id, B.name, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id)		## good enough for now... move
 
 			for band in bands:
-
-					# 'id': fields.Integer,
-					# 'other_band_id': fields.String,
-					# 'other_band_name': fields.String,
-					# 'notes': fields.String,
-					# 'timesConnected': fields.String,
-					# 'active': fields.Boolean
 
 				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
 				band.c_id = model_to_dict(band.connection)["id"]
@@ -122,25 +120,78 @@ class ConnectionBB(Resource):
 				######################################################################
 				print(band.__dict__)
 
-			return ([marshal(band, band_band_fields) for band in bands], 200)
+			return ([marshal(band, connection_fields) for band in bands], 200)
 			# return "hitting"
 		except models.Connection.DoesNotExist:
 			abort(404)
 
-
 	
-class BandGenreDelete(Resource):
+class ConnectionBBDelete(Resource):
 	def __init__(self):
 		super().__init__()
 
 	## delete genre of band -- WORKING
-	def delete(self, bg_id):
-		band_genre_to_delete = models.BandGenre.get_or_none(models.BandGenre.id == bg_id)
-		if band_genre_to_delete:
-			band_genre_to_delete.delete_instance()
-			return ("band genre deleted", 200)
+	def delete(self, c_id):
+		connection_bb_delete = models.Connection.get_or_none(models.Connection.id == c_id)
+		if connection_bb_delete:
+			connection_bb_delete.delete_instance()
+			return ("connection between bands deleted", 200)
 		else:
 			abort(404)
+
+class ConnectionBBEdit(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'notes',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'active',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+
+	# Edit Connection Info
+	def put(self, c_id):
+		try:
+			args = self.reqparse.parse_args()
+			print(args, 'hittingggg ')
+			connection = models.Connection.get(models.Connection.id == c_id)
+			if args.notes:
+				connection.notes = args.notes
+			if args.active:
+				connection.active = args.active
+			connection.save()
+			return (marshal(connection, band_band_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
+
+class ReconnectBB(Resource):
+	def __init__(self):
+		super().__init__()
+
+	# Increase connection count
+	def put(self, c_id):
+		try:
+			connection = models.Connection.get(models.Connection.id == c_id)
+			connection.timesConnected += 1
+			connection.save()
+			return (marshal(connection, band_band_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
+
+
+
+
+
+
+
+
+
 
 	# Create connection between two foreign key ids
 	# Edit non Foreign Key values of connection
@@ -163,3 +214,20 @@ api.add_resource(
 	endpoint="connection_bb"
 	)
 
+api.add_resource(
+	ConnectionBBDelete,
+	'/connections/bb/<int:c_id>/delete',
+	endpoint="connection_bb_delete"
+	)
+
+api.add_resource(
+	ConnectionBBEdit,
+	'/connections/bb/<int:c_id>/edit',
+	endpoint="connection_bb_edit"
+	)
+
+api.add_resource(
+	ReconnectBB,
+	'/connections/bb/<int:c_id>/reconnect',
+	endpoint="reconnect_bb"
+	)
