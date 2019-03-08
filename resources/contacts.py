@@ -49,6 +49,58 @@ class ContactsNew(Resource):
 		contact = models.Contact.create(**args)
 		return (contact, 200)
 
+class ContactEdit(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'name',
+	    required=False,
+	    help='No contact name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'email',
+	    required=False,
+	    help='No contact name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'city',
+	    required=False,
+	    help='No contact name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'country',
+	    required=False,
+	    help='No contact name provided',
+	    location=['form', 'json']
+	  )
+
+	## contact edit -- not working
+	def put(self, c_id):
+		try:
+			args = self.reqparse.parse_args()
+			print(args, 'hittingggg ')
+			# print(type(c_id))
+			query = models.Contact.update(**args).where(models.Contact.id==c_id)
+			query.execute()
+			return (marshal(models.Contact.get(models.Contact.id==c_id), contact_fields), 200)
+			return ('you hit that shit', 200)
+
+		except models.Contact.DoesNotExist:
+			return ('contact not found', 404)
+
+
+	# @marshal_with(dog_fields)
+	# def put(self, id):
+	# 	args = self.reqparse.parse_args()
+	# 	query = models.Dog.update(**args).where(models.Dog.id==id)
+	# 	## we have to execute the update query
+	# 	query.execute()
+	# 	return (models.Dog.get(models.Dog.id==id), 200)
+
+
 class ContactsList(Resource):
 	def __init__(self):
 	  self.reqparse = reqparse.RequestParser()
@@ -62,7 +114,7 @@ class Contact(Resource):
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
 
-	# View contact -- untested
+	# View contact -- Working
 	def get(self, c_id):
 		try: 
 			contact = models.Contact.get(models.Contact.id == c_id)
@@ -79,18 +131,34 @@ class Contact(Resource):
 		else:
 			abort(404)
 
+class ContactSearch(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## contact search == working for name 
+	def get(self):
+		if(request.args.get('name')):
+			name = request.args.get('name')
+			print(name)
+			contacts = models.Contact.select().where(models.Contact.name ** f'%{name}%') 
+			if (contacts):
+				return ([marshal(contact, contact_fields) for contact in contacts], 200)
+			else:
+				return 404
+
 
 
 	# Create contact -- done
 	# View all contacts -- done
-	# View contact
+	# View contact -- done
 	# Edit contact 
-	# Delete Contact
-	# Email contact
-	# Search Contacts
+	# Delete Contact -- done
+	# Search Contacts -- done
 
 
 
+
+	# Email contact -- probably on front end
 
 
 
@@ -125,17 +193,17 @@ api.add_resource(
 	endpoint="contact"
 	)
 
-# api.add_resource(
-# 	ContactEdit,
-# 	'/contacts/<int:c_id>/edit',
-# 	endpoint="contact_edit"
-# 	)
+api.add_resource(
+	ContactEdit,
+	'/contacts/<int:c_id>/edit',
+	endpoint="contact_edit"
+	)
 
-# api.add_resource(
-# 	ContactSearch,
-# 	'/contacts/search',
-# 	endpoint="contact_search"
-# 	)
+api.add_resource(
+	ContactSearch,
+	'/contacts/search',
+	endpoint="contact_search"
+	)
 
 
 
