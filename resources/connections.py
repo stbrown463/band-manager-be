@@ -255,7 +255,7 @@ class ConnectionBVDelete(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## delete band venue connection -- untested
+	## delete band venue connection -- working!!
 	def delete(self, c_id):
 		connection_bv_delete = models.Connection.get_or_none(models.Connection.id == c_id)
 		if connection_bv_delete:
@@ -264,50 +264,51 @@ class ConnectionBVDelete(Resource):
 		else:
 			abort(404)
 
-# class ConnectionbfEdit(Resource):
-# 	def __init__(self):
-# 	  self.reqparse = reqparse.RequestParser()
-# 	  self.reqparse.add_argument(
-# 	    'notes',
-# 	    required=False,
-# 	    help='No id provided',
-# 	    location=['form', 'json']
-# 	  )
-# 	  self.reqparse.add_argument(
-# 	    'active',
-# 	    required=False,
-# 	    help='No id provided',
-# 	    location=['form', 'json']
-# 	  )
+class ConnectionBVEdit(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'notes',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'active',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
 
-# 	# Edit Connection Info == working!!
-# 	def put(self, c_id):
-# 		try:
-# 			args = self.reqparse.parse_args()
-# 			print(args, 'hittingggg ')
-# 			connection = models.Connection.get(models.Connection.id == c_id)
-# 			if args.notes:
-# 				connection.notes = args.notes
-# 			if args.active:
-# 				connection.active = args.active
-# 			connection.save()
-# 			return (marshal(connection, band_band_fields), 200)
-# 		except models.Connection.DoesNotExist:
-# 			return ('connection not found', 404)
+	# Edit Connection Info == untested
+	def put(self, c_id):
+		try:
+			args = self.reqparse.parse_args()
+			print(args, 'hittingggg ')
+			connection = models.Connection.get(models.Connection.id == c_id)
+			if args.notes:
+				connection.notes = args.notes
+			if args.active:
+				connection.active = args.active
+			connection.save()
+			return (marshal(connection, band_venue_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
 
-# class Reconnectbf(Resource):
-# 	def __init__(self):
-# 		super().__init__()
 
-# 	# Increase connection count === working!!
-# 	def put(self, c_id):
-# 		try:
-# 			connection = models.Connection.get(models.Connection.id == c_id)
-# 			connection.timesConnected += 1
-# 			connection.save()
-# 			return (marshal(connection, band_band_fields), 200)
-# 		except models.Connection.DoesNotExist:
-# 			return ('connection not found', 404)
+class ReconnectBV(Resource):
+	def __init__(self):
+		super().__init__()
+
+	# Increase connection count === working!!
+	def put(self, c_id):
+		try:
+			connection = models.Connection.get(models.Connection.id == c_id)
+			connection.timesConnected += 1
+			connection.save()
+			return (marshal(connection, band_venue_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
 
 
 
@@ -375,16 +376,16 @@ api.add_resource(
 	endpoint="connection_bv_delete"
 	)
 
-# api.add_resource(
-# 	ConnectionBVEdit,
-# 	'/connections/bv/<int:c_id>/edit',
-# 	endpoint="connection_bv_edit"
-# 	)
+api.add_resource(
+	ConnectionBVEdit,
+	'/connections/bv/<int:c_id>/edit',
+	endpoint="connection_bv_edit"
+	)
 
-# api.add_resource(
-# 	ReconnectBV,
-# 	'/connections/bv/<int:c_id>/reconnect',
-# 	endpoint="reconnect_bv"
-# 	)
+api.add_resource(
+	ReconnectBV,
+	'/connections/bv/<int:c_id>/reconnect',
+	endpoint="reconnect_bv"
+	)
 
 
