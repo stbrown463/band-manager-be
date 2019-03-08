@@ -101,6 +101,35 @@ class VenuesList(Resource):
 		venues = [marshal(venue, venue_fields) for venue in models.Venue.select()]
 		return venues
 
+class Venue(Resource):
+	def __init__(self):
+		self.reqparse = reqparse.RequestParser()
+
+	# View venue -- untested
+	def get(self, v_id):
+		try: 
+			venue = models.Venue.get(models.Venue.id == v_id)
+			return (marshal(venue, venue_fields), 200)
+		except models.Venue.DoesNotExist:
+			return ('venue not found', 404)
+
+	# Delete venue -- untested admin only
+	def delete(self, v_id):
+		venue_to_delete = models.Venue.get_or_none(models.Venue.id == v_id)
+		if venue_to_delete:
+			venue_to_delete.delete_instance()
+			return ("venue deleted", 200)
+		else:
+			abort(404)
+
+
+
+	# Create venue -- done
+	# Venue indes -- done
+	# View venue 
+	# edit venue 
+	# delete venue -- only if confirmed contact of venue
+	# Search Venue
 
 
 
@@ -118,6 +147,12 @@ api.add_resource(
 	VenuesNew,
 	'/venues/new',
 	endpoint="venues_new"
+	)
+
+api.add_resource(
+	Venue,
+	'/venues/<int:v_id>',
+	endpoint="venue"
 	)
 
 
