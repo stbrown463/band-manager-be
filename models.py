@@ -65,16 +65,16 @@ class Contact(Model):
 	class Meta:
 		database = DATABASE
 
-# class Show(Model):
-# 	date = DateTimeField()
-# 	loadIn = DateTimeField()
-# 	doors = DateTimeField()
-# 	notes = CharField()
-# 	poster_url = CharField()
-# 	venue = ForeignKeyField(Venue)
+class Show(Model):
+	date = DateTimeField(formats=['%Y-%m-%d %H:%M:%S'])
+	loadIn = DateTimeField(formats=['%Y-%m-%d %H:%M:%S'])
+	doors = DateTimeField(formats=['%Y-%m-%d %H:%M:%S'])
+	notes = CharField()
+	poster_url = CharField()
+	venue = ForeignKeyField(Venue)
 
-# 	class Meta:
-# 		database = DATABASE
+	class Meta:
+		database = DATABASE
 
 # class Role(Model):
 # 	name = CharField()
@@ -96,7 +96,7 @@ class BandGenre(Model):
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show], safe=True)
 	DATABASE.close()
 
 

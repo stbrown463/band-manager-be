@@ -77,7 +77,7 @@ class ContactEdit(Resource):
 	    location=['form', 'json']
 	  )
 
-	## contact edit -- not working
+	## contact edit -- working, but need to pass in all args, even if not changing
 	def put(self, c_id):
 		try:
 			args = self.reqparse.parse_args()
@@ -151,7 +151,7 @@ class ContactSearch(Resource):
 	# Create contact -- done
 	# View all contacts -- done
 	# View contact -- done
-	# Edit contact 
+	# Edit contact -- done
 	# Delete Contact -- done
 	# Search Contacts -- done
 

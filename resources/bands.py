@@ -3,6 +3,7 @@ from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with
 from flask import jsonify, Blueprint, abort, request
 from playhouse.shortcuts import model_to_dict, dict_to_model
 
+import json
 import models
 
 ### PRINTS RAW SQL QUERIES TO LOG
