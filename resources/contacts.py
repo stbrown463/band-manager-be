@@ -35,7 +35,7 @@ class ContactsNew(Resource):
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
-	    'country',
+	    'state',
 	    required=False,
 	    help='No contact name provided',
 	    location=['form', 'json']
@@ -71,7 +71,7 @@ class ContactEdit(Resource):
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
-	    'country',
+	    'state',
 	    required=False,
 	    help='No contact name provided',
 	    location=['form', 'json']

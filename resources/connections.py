@@ -63,7 +63,7 @@ connection_fields = {
 # }
 
 
-################# BAND TO BAND CONNECTIONS #######################################
+###################### BAND TO BAND CONNECTION ROUTES #######################################
 
 class ConnectionBBNew(Resource):
 	def __init__(self):
@@ -187,7 +187,7 @@ class ReconnectBB(Resource):
 			return ('connection not found', 404)
 
 
-############### BAND TO VENUE CONNECTIONS ##############################
+############### BAND TO VENUE CONNECTION ROUTES ##############################
 
 class ConnectionBVNew(Resource):
 	def __init__(self):
@@ -311,8 +311,129 @@ class ReconnectBV(Resource):
 			return ('connection not found', 404)
 
 
+################## BAND TO CONTACT CONNECTION ROUTES  ######################
+
+class ConnectionBCNew(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'my_band_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'contact_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'notes',
+	    required=False,
+	    help='No notes provided',
+	    location=['form', 'json']
+	  )
+
+	## add band to contact connection -- working as intended
+	def post(self):
+		args = self.reqparse.parse_args()
+		print(args, 'hittingggg ')
+		connection = models.Connection.get_or_create(**args)
+		print(connection[1])
+		if connection[1]:
+			return (marshal(connection[0], band_contact_fields), 200)
+		else: 
+			return (marshal(connection[0], band_contact_fields), 403)
 
 
+class ConnectionBC(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## view connections of band -- WORKING -- should add querying for cities as well
+	def get(self, b_id):
+		print('hitting')
+		try:
+			P = models.Contact.alias()
+			C = models.Connection.alias()
+
+			contacts = P.select().join(C, on=(C.contact_id == P.id)).select(P.id, P.name, P.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id)		## good enough for now... move
+
+			for contact in contacts:
+
+				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
+				contact.c_id = model_to_dict(contact.connection)["id"]
+				contact.notes = model_to_dict(contact.connection)["notes"]
+				contact.timesConnected = model_to_dict(contact.connection)["timesConnected"]
+				contact.active = model_to_dict(contact.connection)["active"]
+				######################################################################
+				print(contact.__dict__)
+
+			return ([marshal(contact, connection_fields) for contact in contacts], 200)
+			# return "hitting"
+		except models.Connection.DoesNotExist:
+			abort(404)
+
+	
+class ConnectionBCDelete(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## delete band venue connection -- working!!
+	def delete(self, c_id):
+		connection_bv_delete = models.Connection.get_or_none(models.Connection.id == c_id)
+		if connection_bv_delete:
+			connection_bv_delete.delete_instance()
+			return ("band to venue connection deleted", 200)
+		else:
+			abort(404)
+
+# class ConnectionBVEdit(Resource):
+# 	def __init__(self):
+# 	  self.reqparse = reqparse.RequestParser()
+# 	  self.reqparse.add_argument(
+# 	    'notes',
+# 	    required=False,
+# 	    help='No id provided',
+# 	    location=['form', 'json']
+# 	  )
+# 	  self.reqparse.add_argument(
+# 	    'active',
+# 	    required=False,
+# 	    help='No id provided',
+# 	    location=['form', 'json']
+# 	  )
+
+# 	# Edit Connection Info == untested
+# 	def put(self, c_id):
+# 		try:
+# 			args = self.reqparse.parse_args()
+# 			print(args, 'hittingggg ')
+# 			connection = models.Connection.get(models.Connection.id == c_id)
+# 			if args.notes:
+# 				connection.notes = args.notes
+# 			if args.active:
+# 				connection.active = args.active
+# 			connection.save()
+# 			return (marshal(connection, band_venue_fields), 200)
+# 		except models.Connection.DoesNotExist:
+# 			return ('connection not found', 404)
+
+
+# class ReconnectBV(Resource):
+# 	def __init__(self):
+# 		super().__init__()
+
+# 	# Increase connection count === working!!
+# 	def put(self, c_id):
+# 		try:
+# 			connection = models.Connection.get(models.Connection.id == c_id)
+# 			connection.timesConnected += 1
+# 			connection.save()
+# 			return (marshal(connection, band_venue_fields), 200)
+# 		except models.Connection.DoesNotExist:
+# 			return ('connection not found', 404)
 
 
 	# Create connection between two foreign key ids
@@ -387,5 +508,37 @@ api.add_resource(
 	'/connections/bv/<int:c_id>/reconnect',
 	endpoint="reconnect_bv"
 	)
+
+##### BAND TO CONTACT ENDPOINTS #########
+
+api.add_resource(
+	ConnectionBCNew,
+	'/connections/bc/new',
+	endpoint="connection_bc_new"
+	)
+
+api.add_resource(
+	ConnectionBC,
+	'/connections/bc/<int:b_id>',
+	endpoint="connection_bc"
+	)
+
+api.add_resource(
+	ConnectionBCDelete,
+	'/connections/bc/<int:c_id>/delete',
+	endpoint="connection_bc_delete"
+	)
+
+# api.add_resource(
+# 	ConnectionBCEdit,
+# 	'/connections/bc/<int:c_id>/edit',
+# 	endpoint="connection_bc_edit"
+# 	)
+
+# api.add_resource(
+# 	ReconnectBC,
+# 	'/connections/bc/<int:c_id>/reconnect',
+# 	endpoint="reconnect_bc"
+# 	)
 
 
