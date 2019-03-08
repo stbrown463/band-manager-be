@@ -13,7 +13,7 @@ venue_fields = {
 	'streetAddress':fields.String,
 	'zipcode': fields.String,
 	'city': fields.String,
-	'country': fields.String,
+	'state': fields.String,
 	'longitude': fields.String,
 	'latitude': fields.String,
 	'website': fields.String
@@ -59,7 +59,7 @@ class VenuesNew(Resource):
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
-	    'country',
+	    'state',
 	    required=False,
 	    help='No venue name provided',
 	    location=['form', 'json']
@@ -105,7 +105,7 @@ class Venue(Resource):
 	def __init__(self):
 		self.reqparse = reqparse.RequestParser()
 
-	# View venue -- untested
+	# View venue -- working
 	def get(self, v_id):
 		try: 
 			venue = models.Venue.get(models.Venue.id == v_id)
@@ -162,7 +162,7 @@ class VenueEdit(Resource):
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
-	    'country',
+	    'state',
 	    required=False,
 	    help='No venue name provided',
 	    location=['form', 'json']

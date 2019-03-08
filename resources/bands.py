@@ -18,7 +18,7 @@ band_fields = {
 	'img_url': fields.String,
 	'email': fields.String,
 	'city': fields.String,
-	'country': fields.String,
+	'state': fields.String,
 	'website': fields.String
 }
 
@@ -64,7 +64,7 @@ class BandsNew(Resource):
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
-	    'country',
+	    'state',
 	    required=False,
 	    help='No band name provided',
 	    location=['form', 'json']
@@ -140,7 +140,7 @@ class BandEdit(Resource):
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
-	    'country',
+	    'state',
 	    required=False,
 	    help='No band name provided',
 	    location=['form', 'json']

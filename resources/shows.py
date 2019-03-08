@@ -187,6 +187,7 @@ api.add_resource(
 	endpoint="show_edit"
 	)
 
+### search by band id or venue id... need through tables first
 # api.add_resource(
 # 	ShowSearch,
 # 	'/shows/search',

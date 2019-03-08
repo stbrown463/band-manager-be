@@ -1,6 +1,8 @@
-import datetime
-
 from peewee import *
+from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+
+import datetime
 
 
 DATABASE = SqliteDatabase('band-manager.sqlite')
@@ -11,16 +13,31 @@ DATABASE = SqliteDatabase('band-manager.sqlite')
 #   )
 
 
-# class User(Model):
-# 	username = CharField()
-# 	password = CharField()
-# 	email = CharField()
-# 	bio = CharField()
-# 	city = CharField()
-# 	country = CharField()
+class User(UserMixin, Model):
+	username = CharField(unique=True)
+	password = CharField()
+	email = CharField(unique=True)
+	bio = CharField()
+	city = CharField()
+	state = CharField()
 
-# 	class Meta:
-# 		database = DATABASE
+	class Meta:
+		database = DATABASE
+
+	@classmethod
+	def create_user(cls, username, email, password, bio, city, state):
+		email = email.lower()
+		try:
+			cls.select().where(
+				(cls.email==email)
+			).get()
+		except cls.DoesNotExist:
+			user = cls(username=username, email=email, bio=bio, city=city, state=state)
+			user.password = generate_password_hash(password)
+			user.save()
+			return user
+		else:
+			raise Exception("User with email or username already exists")
 
 class Band(Model):
 	name = CharField()
@@ -29,7 +46,7 @@ class Band(Model):
 	# primaryContact = ForeignKeyField(User)
 	email = CharField()
 	city = CharField()
-	country = CharField()
+	state = CharField()
 	website = CharField()
 
 	class Meta:
@@ -48,7 +65,7 @@ class Venue(Model):
 	streetAddress =CharField()
 	zipcode = IntegerField()
 	city = CharField()
-	country = CharField()
+	state = CharField()
 	longitude = DecimalField()
 	latitude = DecimalField()
 	website = CharField()
@@ -60,7 +77,7 @@ class Contact(Model):
 	name = CharField()
 	email = CharField()
 	city = CharField()
-	country = CharField()
+	state = CharField()
 
 	class Meta:
 		database = DATABASE
@@ -96,7 +113,7 @@ class BandGenre(Model):
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User], safe=True)
 	DATABASE.close()
 
 
