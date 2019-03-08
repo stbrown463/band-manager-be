@@ -109,13 +109,13 @@ class BandGenre(Model):
 		database = DATABASE
 
 class Connection(Model):
-	my_band_id = ForeignKeyField(Band)
-	other_band_id = ForeignKeyField(Band)
-	user_id = ForeignKeyField(User)
-	venue_id = ForeignKeyField(Venue)
-	contact_id = ForeignKeyField(Contact)
-	notes = CharField()
-	timesConnected = IntegerField(null=True, default=0)
+	my_band_id = ForeignKeyField(Band, null=True)
+	other_band_id = ForeignKeyField(Band, null=True)
+	user_id = ForeignKeyField(User, null=True)
+	venue_id = ForeignKeyField(Venue, null=True)
+	contact_id = ForeignKeyField(Contact, null=True)
+	notes = CharField(null=True)
+	timesConnected = IntegerField(default=1)
 	active = BooleanField(default=True)
 
 	class Meta:

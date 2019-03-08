@@ -9,6 +9,7 @@ from resources.genres import genres_api
 from resources.venues import venues_api
 from resources.contacts import contacts_api
 from resources.shows import shows_api
+from resources.connections import connections_api
 
 import models
 import os
@@ -35,6 +36,7 @@ CORS(genres_api, origins=["Heroku FE link here", "http://localhost:3000"], suppo
 CORS(venues_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
 CORS(contacts_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
 CORS(shows_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
+CORS(connections_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
 
 app.register_blueprint(users_api, url_prefix='/api/v1')
 app.register_blueprint(bands_api, url_prefix='/api/v1')
@@ -42,6 +44,7 @@ app.register_blueprint(genres_api, url_prefix='/api/v1')
 app.register_blueprint(venues_api, url_prefix='/api/v1')
 app.register_blueprint(contacts_api, url_prefix='/api/v1')
 app.register_blueprint(shows_api, url_prefix='/api/v1')
+app.register_blueprint(connections_api, url_prefix='/api/v1')
 
 @app.route('/')
 def hello_world():
