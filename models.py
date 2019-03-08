@@ -41,19 +41,20 @@ class Genre(Model):
 	class Meta:
 		database = DATABASE
 
-# class Venue(Model):
-# 	name = CharField()
-# 	email = CharField()
-# 	streetAddress =CharField()
-# 	zipcode = IntegerField()
-# 	city = CharField()
-# 	country = CharField()
-# 	longitude = DecimalField()
-# 	latitude = DecimalField()
-# 	website = CharField()
+class Venue(Model):
+	name = CharField()
+	email = CharField()
+	img_url = CharField()
+	streetAddress =CharField()
+	zipcode = IntegerField()
+	city = CharField()
+	country = CharField()
+	longitude = DecimalField()
+	latitude = DecimalField()
+	website = CharField()
 
-# 	class Meta:
-# 		database = DATABASE
+	class Meta:
+		database = DATABASE
 
 # class Contact(Model):
 # 	name = CharField()
@@ -95,7 +96,7 @@ class BandGenre(Model):
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue], safe=True)
 	DATABASE.close()
 
 

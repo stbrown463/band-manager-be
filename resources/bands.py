@@ -5,10 +5,12 @@ from playhouse.shortcuts import model_to_dict, dict_to_model
 
 import models
 
-import logging
-logger = logging.getLogger('peewee')
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler())
+
+### PRINTS RAW SQL QUERIES TO LOG
+# import logging
+# logger = logging.getLogger('peewee')
+# logger.setLevel(logging.DEBUG)
+# logger.addHandler(logging.StreamHandler())
 
 band_fields = {
 	'id': fields.Integer,
@@ -27,7 +29,7 @@ band_genre_fields = {
 }
 
 genre_fields = {
-	'id': fields.String,
+	'bg_id': fields.String,
 	'name': fields.String
 }
 
@@ -221,18 +223,10 @@ class BandGenre(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## view genres of band -- need to return bg_id too
+	## view genres of band -- WORKING
 	def get(self, b_id):
 		print('hitting')
 		try:
-			# Genre = models.Genre
-			# BandGenre = models.BandGenre
-
-			# asdf = Genre.select(Genre.name, BandGenre.id).join(BandGenre, on=(BandGenre.genre_id == Genre.id)).where(BandGenre.band_id == b_id)
-
-			# for thing in asdf:
-			# 	print(thing)
-
 			## RAW SQL QUERY
 			# select genre.name, bandgenre.id from genre INNER JOIN bandgenre ON genre.id = bandgenre.genre_id WHERE bandgenre.band_id = 1;
 
@@ -241,40 +235,16 @@ class BandGenre(Resource):
 
 			genres = G.select().join(BG).select(BG.id, G.name).where(BG.band_id == b_id)		## good enough for now... move
 
-
-
-# ('SELECT "t1"."id", "t2"."name" FROM "genre" AS "t2" INNER JOIN "bandgenre" AS "t1" ON ("t1"."genre_id" = "t2"."id") WHERE ("t1"."band_id" = ?)', [2])
-# {'__data__': {'name': 'rock'}, '_dirty': set(), '__rel__': {}, 'bandgenre': <BandGenre: 3>} == band genres
-# ('SELECT "t1"."id", "t1"."band_id", "t1"."genre_id" FROM "bandgenre" AS "t1" WHERE ("t1"."band_id" = ?)', [2])
-# ('SELECT "t1"."id", "t1"."name", "t1"."verified", "t1"."img_url", "t1"."email", "t1"."city", "t1"."country", "t1"."website" FROM "band" AS "t1" WHERE ("t1"."id" = ?) LIMIT ? OFFSET ?', [2, 1, 0])
-# ('SELECT "t1"."id", "t1"."name" FROM "genre" AS "t1" WHERE ("t1"."id" = ?) LIMIT ? OFFSET ?', [2, 1, 0])
-			# ids = BG.select().where(BG.band_id == b_id)
-
-
-
-
-			# q = genres & ids
-			# for e in q:
-			# 	print(e.__dict__, '== combined query')
-
-			# genres = models.Genre.select(models.Genre.name, models.BandGenre.id).join(models.BandGenre).where(
-			# 	models.BandGenre.band_id == b_id)
-
-			# bandgenres = models.BandGenre.select(models.BandGenre.id).where(models.BandGenre.band_id == b_id)
-
-			# query = genres | bandgenres
 			for genre in genres:
-				print(genre.__dict__,'== band genres')
-				print(type(genre.bandgenre))
-				print(genre.bandgenre)
-				print(model_to_dict(genre.bandgenre))
-				genre.id = model_to_dict(genre.bandgenre)["id"]
-				print(genre.__dict__)
-			# for genre in genres: 
-			# 	print(genre.name)
-			# 	print(genre.id)
-			# 	print(BG.id)
-			# return ([[marshal(genre, genre_fields) for genre in genres], [marshal(id, band_genre_fields) for id in ids]], 200)
+				# print(genre.__dict__,'== band genres')
+				# print(type(genre.bandgenre))
+				# print(genre.bandgenre)
+				# print(model_to_dict(genre.bandgenre))
+
+				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
+				genre.bg_id = model_to_dict(genre.bandgenre)["id"]
+				######################################################################
+
 			return ([marshal(genre, genre_fields) for genre in genres], 200)
 		except models.BandGenre.DoesNotExist:
 			abort(404)
@@ -285,14 +255,18 @@ class BandGenreDelete(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## delete genre of band -- no errors, not verified working though
+	## delete genre of band -- WORKING
 	def delete(self, bg_id):
 		band_genre_to_delete = models.BandGenre.get_or_none(models.BandGenre.id == bg_id)
 		if band_genre_to_delete:
-			models.BandGenre.delete().where(models.BandGenre.id == bg_id)
+			band_genre_to_delete.delete_instance()
 			return ("band genre deleted", 200)
 		else:
 			abort(404)
+
+
+			user = User.get(User.id == 1)
+			user.delete_instance()
 
 
 	# Delete genre of band
