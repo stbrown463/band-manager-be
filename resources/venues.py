@@ -25,61 +25,61 @@ class VenuesNew(Resource):
 	  self.reqparse.add_argument(
 	    'name',
 	    required=True,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'img_url',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'email',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'streetAddress',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'zipcode',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'city',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'country',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'longitude',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'latitude',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )
 	  self.reqparse.add_argument(
 	    'website',
 	    required=False,
-	    help='No band name provided',
+	    help='No venue name provided',
 	    location=['form', 'json']
 	  )	  
 	  super().__init__()
@@ -122,13 +122,111 @@ class Venue(Resource):
 		else:
 			abort(404)
 
+class VenueEdit(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'name',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'img_url',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'email',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'streetAddress',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'zipcode',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'city',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'country',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'longitude',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'latitude',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'website',
+	    required=False,
+	    help='No venue name provided',
+	    location=['form', 'json']
+	  )	  
+	  super().__init__
 
+	## EDIT venue working
+	def put(self, v_id):
+		try:
+			args = self.reqparse.parse_args()
+			print(args, 'hittingggg ')
+			query = models.Venue.update(**args).where(models.Venue.id==v_id)
+			query.execute()
+			return (marshal(models.Venue.get(models.Venue.id==v_id), venue_fields), 200)
+
+		except models.Venue.DoesNotExist:
+			return ('venue not found', 404)
+
+class VenueSearch(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## venue search == working for name and city
+	def get(self):
+		if(request.args.get('city')):
+			city = request.args.get('city')
+			print(city)
+			venues = models.Venue.select().where(models.Venue.city ** f'%{city}%') 
+			if (venues):
+				return ([marshal(venue, venue_fields) for venue in venues], 200)
+			else:
+				return 404
+		if(request.args.get('name')):
+			name = request.args.get('name')
+			print(name)
+			venues = models.Venue.select().where(models.Venue.name ** f'%{name}%') 
+			if (venues):
+				return ([marshal(venue, venue_fields) for venue in venues], 200)
+			else:
+				return 404
 
 	# Create venue -- done
 	# Venue indes -- done
-	# View venue 
-	# edit venue 
-	# delete venue -- only if confirmed contact of venue
+	# View venue  -- done
+	# edit venue -- done
+	# delete venue -- done
 	# Search Venue
 
 
@@ -153,6 +251,18 @@ api.add_resource(
 	Venue,
 	'/venues/<int:v_id>',
 	endpoint="venue"
+	)
+
+api.add_resource(
+	VenueEdit,
+	'/venues/<int:v_id>/edit',
+	endpoint="venue_edit"
+	)
+
+api.add_resource(
+	VenueSearch,
+	'/venues/search',
+	endpoint="venue_search"
 	)
 
 
