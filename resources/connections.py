@@ -127,20 +127,6 @@ class ConnectionBB(Resource):
 		except models.Connection.DoesNotExist:
 			abort(404)
 
-	
-class ConnectionBBDelete(Resource):
-	def __init__(self):
-		super().__init__()
-
-	## delete genre of band -- WORKING
-	def delete(self, c_id):
-		connection_bb_delete = models.Connection.get_or_none(models.Connection.id == c_id)
-		if connection_bb_delete:
-			connection_bb_delete.delete_instance()
-			return ("connection between bands deleted", 200)
-		else:
-			abort(404)
-
 class ConnectionBBEdit(Resource):
 	def __init__(self):
 	  self.reqparse = reqparse.RequestParser()
@@ -248,20 +234,6 @@ class ConnectionBV(Resource):
 			return ([marshal(venue, connection_fields) for venue in venues], 200)
 			# return "hitting"
 		except models.Connection.DoesNotExist:
-			abort(404)
-
-	
-class ConnectionBVDelete(Resource):
-	def __init__(self):
-		super().__init__()
-
-	## delete band venue connection -- working!!
-	def delete(self, c_id):
-		connection_bv_delete = models.Connection.get_or_none(models.Connection.id == c_id)
-		if connection_bv_delete:
-			connection_bv_delete.delete_instance()
-			return ("band to venue connection deleted", 200)
-		else:
 			abort(404)
 
 class ConnectionBVEdit(Resource):
@@ -375,66 +347,70 @@ class ConnectionBC(Resource):
 		except models.Connection.DoesNotExist:
 			abort(404)
 
-	
-class ConnectionBCDelete(Resource):
+
+class ConnectionBCEdit(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'notes',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'active',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+
+	# Edit Connection Info == untested
+	def put(self, c_id):
+		try:
+			args = self.reqparse.parse_args()
+			print(args, 'hittingggg ')
+			connection = models.Connection.get(models.Connection.id == c_id)
+			if args.notes:
+				connection.notes = args.notes
+			if args.active:
+				connection.active = args.active
+			connection.save()
+			return (marshal(connection, band_contact_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
+
+
+class ReconnectBC(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## delete band venue connection -- working!!
+	# Increase connection count === working!!
+	def put(self, c_id):
+		try:
+			connection = models.Connection.get(models.Connection.id == c_id)
+			connection.timesConnected += 1
+			connection.save()
+			return (marshal(connection, band_contact_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
+
+
+
+
+######### UNIVERSAL CONNECTION DELETE ROUTE #################
+
+class ConnectionDelete(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## delete connection -- working!!
 	def delete(self, c_id):
 		connection_bv_delete = models.Connection.get_or_none(models.Connection.id == c_id)
 		if connection_bv_delete:
 			connection_bv_delete.delete_instance()
-			return ("band to venue connection deleted", 200)
+			return (f"connection of id {c_id} deleted", 200)
 		else:
 			abort(404)
-
-# class ConnectionBVEdit(Resource):
-# 	def __init__(self):
-# 	  self.reqparse = reqparse.RequestParser()
-# 	  self.reqparse.add_argument(
-# 	    'notes',
-# 	    required=False,
-# 	    help='No id provided',
-# 	    location=['form', 'json']
-# 	  )
-# 	  self.reqparse.add_argument(
-# 	    'active',
-# 	    required=False,
-# 	    help='No id provided',
-# 	    location=['form', 'json']
-# 	  )
-
-# 	# Edit Connection Info == untested
-# 	def put(self, c_id):
-# 		try:
-# 			args = self.reqparse.parse_args()
-# 			print(args, 'hittingggg ')
-# 			connection = models.Connection.get(models.Connection.id == c_id)
-# 			if args.notes:
-# 				connection.notes = args.notes
-# 			if args.active:
-# 				connection.active = args.active
-# 			connection.save()
-# 			return (marshal(connection, band_venue_fields), 200)
-# 		except models.Connection.DoesNotExist:
-# 			return ('connection not found', 404)
-
-
-# class ReconnectBV(Resource):
-# 	def __init__(self):
-# 		super().__init__()
-
-# 	# Increase connection count === working!!
-# 	def put(self, c_id):
-# 		try:
-# 			connection = models.Connection.get(models.Connection.id == c_id)
-# 			connection.timesConnected += 1
-# 			connection.save()
-# 			return (marshal(connection, band_venue_fields), 200)
-# 		except models.Connection.DoesNotExist:
-# 			return ('connection not found', 404)
-
 
 	# Create connection between two foreign key ids
 	# Edit non Foreign Key values of connection
@@ -459,11 +435,11 @@ api.add_resource(
 	endpoint="connection_bb"
 	)
 
-api.add_resource(
-	ConnectionBBDelete,
-	'/connections/bb/<int:c_id>/delete',
-	endpoint="connection_bb_delete"
-	)
+# api.add_resource(
+# 	ConnectionBBDelete,
+# 	'/connections/bb/<int:c_id>/delete',
+# 	endpoint="connection_bb_delete"
+# 	)
 
 api.add_resource(
 	ConnectionBBEdit,
@@ -491,11 +467,11 @@ api.add_resource(
 	endpoint="connection_bv"
 	)
 
-api.add_resource(
-	ConnectionBVDelete,
-	'/connections/bv/<int:c_id>/delete',
-	endpoint="connection_bv_delete"
-	)
+# api.add_resource(
+# 	ConnectionBVDelete,
+# 	'/connections/bv/<int:c_id>/delete',
+# 	endpoint="connection_bv_delete"
+# 	)
 
 api.add_resource(
 	ConnectionBVEdit,
@@ -523,22 +499,22 @@ api.add_resource(
 	endpoint="connection_bc"
 	)
 
+
 api.add_resource(
-	ConnectionBCDelete,
-	'/connections/bc/<int:c_id>/delete',
-	endpoint="connection_bc_delete"
+	ConnectionBCEdit,
+	'/connections/<int:c_id>/edit',
+	endpoint="connection_bc_edit"
 	)
 
-# api.add_resource(
-# 	ConnectionBCEdit,
-# 	'/connections/bc/<int:c_id>/edit',
-# 	endpoint="connection_bc_edit"
-# 	)
+api.add_resource(
+	ReconnectBC,
+	'/connections/bc/<int:c_id>/reconnect',
+	endpoint="reconnect_bc"
+	)
 
-# api.add_resource(
-# 	ReconnectBC,
-# 	'/connections/bc/<int:c_id>/reconnect',
-# 	endpoint="reconnect_bc"
-# 	)
-
-
+#### UNIVERSAL CONNECTION DELETE ENDPOINT #############
+api.add_resource(
+	ConnectionDelete,
+	'/connections/<int:c_id>/delete',
+	endpoint="connection_delete"
+	)
