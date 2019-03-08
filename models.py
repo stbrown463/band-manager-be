@@ -16,6 +16,7 @@ DATABASE = SqliteDatabase('band-manager.sqlite')
 class User(UserMixin, Model):
 	username = CharField(unique=True)
 	password = CharField()
+	name = CharField()
 	email = CharField(unique=True)
 	bio = CharField()
 	city = CharField()
@@ -25,14 +26,14 @@ class User(UserMixin, Model):
 		database = DATABASE
 
 	@classmethod
-	def create_user(cls, username, email, password, bio, city, state):
+	def create_user(cls, username, name, email, password, bio, city, state):
 		email = email.lower()
 		try:
 			cls.select().where(
 				(cls.email==email)
 			).get()
 		except cls.DoesNotExist:
-			user = cls(username=username, email=email, bio=bio, city=city, state=state)
+			user = cls(username=username, name=name, email=email, bio=bio, city=city, state=state)
 			user.password = generate_password_hash(password)
 			user.save()
 			return user

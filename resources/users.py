@@ -11,6 +11,7 @@ import models
 user_fields = {
 	'id': fields.Integer,
 	'username': fields.String,
+	'name': fields.String,
 	'email': fields.String,
 	'bio': fields.String,
 	'city': fields.String,
@@ -37,6 +38,12 @@ class UserRegister(Resource):
 			'password',
 			required=True,
 			help="no password provided",
+			location=['form', 'json']
+			)
+		self.reqparse.add_argument(
+			'name',
+			required=True,
+			help="no name provided",
 			location=['form', 'json']
 			)
 		self.reqparse.add_argument(
@@ -75,6 +82,7 @@ class UserRegister(Resource):
 					username=args['username'], 
 					password=args['password'], 
 					email=args['email'],
+					name=args['name'],
 					bio=args['bio'],
 					city=args['city'],
 					state=args['state'],

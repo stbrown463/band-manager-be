@@ -394,7 +394,116 @@ class ReconnectBC(Resource):
 		except models.Connection.DoesNotExist:
 			return ('connection not found', 404)
 
+########## BAND TO USER CONNECTION ROUTES ###################
 
+class ConnectionBUNew(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'my_band_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'user_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'notes',
+	    required=False,
+	    help='No notes provided',
+	    location=['form', 'json']
+	  )
+
+	## add band to user connection -- working as intended
+	def post(self):
+		args = self.reqparse.parse_args()
+		print(args, 'hittingggg ')
+		connection = models.Connection.get_or_create(**args)
+		print(connection[1])
+		if connection[1]:
+			return (marshal(connection[0], band_user_fields), 200)
+		else: 
+			return (marshal(connection[0], band_user_fields), 403)
+
+
+class ConnectionBU(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## view connections of band -- WORKING -- should add querying for cities as well
+	def get(self, b_id):
+		print('hitting')
+		try:
+			U = models.User.alias()
+			C = models.Connection.alias()
+
+			users = U.select().join(C, on=(C.user_id == U.id)).select(U.id, U.name, U.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id)		## good enough for now... move
+
+			for user in users:
+
+				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
+				user.c_id = model_to_dict(user.connection)["id"]
+				user.notes = model_to_dict(user.connection)["notes"]
+				user.timesConnected = model_to_dict(user.connection)["timesConnected"]
+				user.active = model_to_dict(user.connection)["active"]
+				######################################################################
+				print(user.__dict__)
+
+			return ([marshal(user, connection_fields) for user in users], 200)
+			# return "hitting"
+		except models.Connection.DoesNotExist:
+			abort(404)
+
+
+class ConnectionBUEdit(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'notes',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'active',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+
+	# Edit Connection Info == working
+	def put(self, c_id):
+		try:
+			args = self.reqparse.parse_args()
+			print(args, 'hittingggg ')
+			connection = models.Connection.get(models.Connection.id == c_id)
+			if args.notes:
+				connection.notes = args.notes
+			if args.active:
+				connection.active = args.active
+			connection.save()
+			return (marshal(connection, band_user_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
+
+
+class ReconnectBU(Resource):
+	def __init__(self):
+		super().__init__()
+
+	# Increase connection count === working!!
+	def put(self, c_id):
+		try:
+			connection = models.Connection.get(models.Connection.id == c_id)
+			connection.timesConnected += 1
+			connection.save()
+			return (marshal(connection, band_contact_fields), 200)
+		except models.Connection.DoesNotExist:
+			return ('connection not found', 404)
 
 
 ######### UNIVERSAL CONNECTION DELETE ROUTE #################
@@ -412,16 +521,19 @@ class ConnectionDelete(Resource):
 		else:
 			abort(404)
 
+
+	## Todo
+
 	# Create connection between two foreign key ids
 	# Edit non Foreign Key values of connection
 
 
-
+###### SET UP API BLUEPRINT ####################
 
 connections_api = Blueprint('resources.connections', __name__)
 api = Api(connections_api)
 
-##### BAND TO BAND ENDPOINTS ##############
+########## BAND TO BAND ENDPOINTS ##############
 
 api.add_resource(
 	ConnectionBBNew,
@@ -434,12 +546,6 @@ api.add_resource(
 	'/connections/bb/<int:b_id>',
 	endpoint="connection_bb"
 	)
-
-# api.add_resource(
-# 	ConnectionBBDelete,
-# 	'/connections/bb/<int:c_id>/delete',
-# 	endpoint="connection_bb_delete"
-# 	)
 
 api.add_resource(
 	ConnectionBBEdit,
@@ -466,12 +572,6 @@ api.add_resource(
 	'/connections/bv/<int:b_id>',
 	endpoint="connection_bv"
 	)
-
-# api.add_resource(
-# 	ConnectionBVDelete,
-# 	'/connections/bv/<int:c_id>/delete',
-# 	endpoint="connection_bv_delete"
-# 	)
 
 api.add_resource(
 	ConnectionBVEdit,
@@ -502,7 +602,7 @@ api.add_resource(
 
 api.add_resource(
 	ConnectionBCEdit,
-	'/connections/<int:c_id>/edit',
+	'/connections/bc/<int:c_id>/edit',
 	endpoint="connection_bc_edit"
 	)
 
@@ -512,7 +612,35 @@ api.add_resource(
 	endpoint="reconnect_bc"
 	)
 
+####### BAND TO USER ENDPOINTS ###############
+
+api.add_resource(
+	ConnectionBUNew,
+	'/connections/bu/new',
+	endpoint="connection_bu_new"
+	)
+
+api.add_resource(
+	ConnectionBU,
+	'/connections/bu/<int:b_id>',
+	endpoint="connection_bu"
+	)
+
+
+api.add_resource(
+	ConnectionBUEdit,
+	'/connections/bu/<int:c_id>/edit',
+	endpoint="connection_bu_edit"
+	)
+
+api.add_resource(
+	ReconnectBU,
+	'/connections/bu/<int:c_id>/reconnect',
+	endpoint="reconnect_bu"
+	)
+
 #### UNIVERSAL CONNECTION DELETE ENDPOINT #############
+
 api.add_resource(
 	ConnectionDelete,
 	'/connections/<int:c_id>/delete',
