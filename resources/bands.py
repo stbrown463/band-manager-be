@@ -5,7 +5,6 @@ from playhouse.shortcuts import model_to_dict, dict_to_model
 
 import models
 
-
 ### PRINTS RAW SQL QUERIES TO LOG
 # import logging
 # logger = logging.getLogger('peewee')
@@ -264,12 +263,6 @@ class BandGenreDelete(Resource):
 		else:
 			abort(404)
 
-
-			user = User.get(User.id == 1)
-			user.delete_instance()
-
-
-	# Delete genre of band
 
 
 

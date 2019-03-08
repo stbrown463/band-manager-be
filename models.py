@@ -56,14 +56,14 @@ class Venue(Model):
 	class Meta:
 		database = DATABASE
 
-# class Contact(Model):
-# 	name = CharField()
-# 	email = CharField()
-# 	city = CharField()
-# 	country = CharField()
+class Contact(Model):
+	name = CharField()
+	email = CharField()
+	city = CharField()
+	country = CharField()
 
-# 	class Meta:
-# 		database = DATABASE
+	class Meta:
+		database = DATABASE
 
 # class Show(Model):
 # 	date = DateTimeField()
@@ -96,7 +96,7 @@ class BandGenre(Model):
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre, Venue], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact], safe=True)
 	DATABASE.close()
 
 

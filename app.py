@@ -6,6 +6,7 @@ from flask_cors import CORS
 from resources.bands import bands_api
 from resources.genres import genres_api
 from resources.venues import venues_api
+from resources.contacts import contacts_api
 
 import models
 import os
@@ -19,10 +20,12 @@ app = Flask(__name__)
 CORS(bands_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
 CORS(genres_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
 CORS(venues_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
+CORS(contacts_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
 
 app.register_blueprint(bands_api, url_prefix='/api/v1')
 app.register_blueprint(genres_api, url_prefix='/api/v1')
 app.register_blueprint(venues_api, url_prefix='/api/v1')
+app.register_blueprint(contacts_api, url_prefix='/api/v1')
 
 @app.route('/')
 def hello_world():
