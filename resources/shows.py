@@ -232,12 +232,26 @@ class BandShow(Resource):
 		except models.BandShow.DoesNotExist:
 			abort(404)
 
+  ### return fields
 	# 'id': fields.String,
 	# 'show_id': fields.String,
 	# 'band_id': fields.String,
 	# 'band_img_url', field.String,
 	# 'band_name': fields.String,
 	# 'email': fields.String,
+
+class BandShowDelete(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## deletedshow of band -- WORKING
+	def delete(self, bs_id):
+		bandshow_to_delete = models.BandShow.get_or_none(models.BandShow.id == bs_id)
+		if bandshow_to_delete:
+			bandshow_to_delete.delete_instance()
+			return ("bandshow deleted", 200)
+		else:
+			abort(404)
 
 
 
@@ -298,11 +312,11 @@ api.add_resource(
 	endpoint="show_bands"
 	)
 
-# api.add_resource(
-# 	BandShowDelete,
-# 	'/shows/band/<int:bs_id>/delete',
-# 	endpoint="show_band_delete"
-# 	)
+api.add_resource(
+	BandShowDelete,
+	'/shows/band/<int:bs_id>/delete',
+	endpoint="show_band_delete"
+	)
 
 
 
