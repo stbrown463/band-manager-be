@@ -94,6 +94,8 @@ class Show(Model):
 	class Meta:
 		database = DATABASE
 
+
+
 # class Role(Model):
 # 	name = CharField()
 
@@ -137,12 +139,20 @@ class BandShow(Model):
 	class Meta:
 		database = DATABASE
 
+class VenueContact(Model):
+	venue_id = ForeignKeyField(Venue)
+	user_id = ForeignKeyField(User, null=True)
+	contact_id = ForeignKeyField(Contact, null=True)
+	active = BooleanField(default=True)
+
+	class Meta:
+		database = DATABASE
 
 
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User, Connection, BandMember, BandShow], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User, Connection, BandMember, BandShow, VenueContact], safe=True)
 	DATABASE.close()
 
 

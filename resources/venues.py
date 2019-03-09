@@ -19,6 +19,18 @@ venue_fields = {
 	'website': fields.String
 }
 
+venue_contact_fields = {
+	'id': fields.Integer,
+	'venue_id': fields.String,
+	'user_id': fields.String,
+	'user_name': fields.String,
+	'user_email': fields.String,
+	'contact_id': fields.String,
+	'contact_name': fields.String,
+	'contact_email': fields.String,
+	'active': fields.Boolean
+}
+
 class VenuesNew(Resource):
 	def __init__(self):
 	  self.reqparse = reqparse.RequestParser()
@@ -222,12 +234,100 @@ class VenueSearch(Resource):
 			else:
 				return 404
 
+######### VENUE CONTACT ROUTES ###################
+
+class VenueContactNew(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'venue_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'user_id',
+	    required=False,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'contact_id',
+	    required=False,
+	    help='No notes provided',
+	    location=['form', 'json']
+	  )
+
+	## add contact or user of venue -- working as intended
+	def post(self):
+		args = self.reqparse.parse_args()
+		print(args, 'hittingggg ')
+		contact = models.VenueContact.get_or_create(**args)
+		print(contact[1])
+		if contact[1]:
+			return (marshal(contact[0], venue_contact_fields), 200)
+		else: 
+			return (marshal(contact[0], venue_contact_fields), 403)
+
+class VenueContact(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## view bands of show -- WORKING
+	def get(self, v_id):
+		print('hitting')
+		try:
+
+			V = models.Venue.alias()
+			VC = models.VenueContact.alias()
+
+			contacts = V.select().join(VC, on=(VC.venue_id == V.id)).select(V.id, V.name, VC.id, VC.user_id, VC.contact_id, VC.active).where(VC.venue_id == v_id)
+
+			for contact in contacts:
+				print(contact.__dict__)
+
+				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
+				contact.venue_id = model_to_dict(contact)["id"]
+				contact.id = model_to_dict(contact.venuecontact)["id"]
+				contact.active = model_to_dict(contact.venuecontact)["active"]
+				if model_to_dict(contact.venuecontact)["user_id"]:
+					contact.user_id = model_to_dict(contact.venuecontact)["user_id"]["id"]
+					contact.user_name = model_to_dict(contact.venuecontact)["user_id"]["name"]
+					contact.user_email = model_to_dict(contact.venuecontact)["user_id"]["email"]
+				if model_to_dict(contact.venuecontact)["contact_id"]:
+					contact.contact_id = model_to_dict(contact.venuecontact)["contact_id"]["id"]
+					contact.contact_name = model_to_dict(contact.venuecontact)["contact_id"]["name"]
+					contact.contact_email = model_to_dict(contact.venuecontact)["contact_id"]["email"]					
+				######################################################################
+
+			return ([marshal(contact, venue_contact_fields) for contact in contacts], 200)
+		except models.VenueContact.DoesNotExist:
+			abort(404)
+
+# venue_contact_fields = {
+# 	'id': fields.Integer,
+# 	'venue_id': fields.String,
+# 	'user_id': fields.String,
+# 	'user_name': fields.String,
+# 	'user_email': fields.String,
+# 	'contact_id': fields.String,
+# 	'contact_name': fields.String,
+# 	'contact_email': fields.String,
+# 	'active': fields.Boolean
+# }
+
+
+
+######## TODO
 	# Create venue -- done
 	# Venue indes -- done
 	# View venue  -- done
 	# edit venue -- done
 	# delete venue -- done
-	# Search Venue
+	# Search Venue -- done
+	# Add contact of venue -- done
+	# View contacts of venue -- done
+	# Change active status --
 
 
 
@@ -265,4 +365,23 @@ api.add_resource(
 	endpoint="venue_search"
 	)
 
+######### VENUE CONTACT ENDPOINTS ###################
+
+api.add_resource(
+	VenueContactNew,
+	'/venues/contact/new',
+	endpoint="venue_contact_new"
+	)
+
+api.add_resource(
+	VenueContact,
+	'/venues/contact/<int:v_id>',
+	endpoint="venue_contact"
+	)
+
+# api.add_resource(
+# 	VenueContactEdit,
+# 	'/venues/contact/<int:vc_id>/edit',
+# 	endpoint="venue_contact_edit"
+# 	)
 
