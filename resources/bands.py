@@ -310,12 +310,10 @@ class BandMember(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## view genres of band -- WORKING
+	## view members of band -- WORKING
 	def get(self, b_id):
 		print('hitting')
 		try:
-			## RAW SQL QUERY
-			# select genre.name, bandgenre.id from genre INNER JOIN bandgenre ON genre.id = bandgenre.genre_id WHERE bandgenre.band_id = 1;
 
 			U = models.User.alias()
 			BM = models.BandMember.alias()
@@ -323,11 +321,6 @@ class BandMember(Resource):
 			users = U.select().join(BM).select(BM.id, BM.user_id, BM.band_id, BM.active, U.name, U.email).where(BM.band_id == b_id)		## good enough for now... move
 
 			for user in users:
-				# print(genre.__dict__,'== band genres')
-				# print(type(genre.bandgenre))
-				# print(genre.bandgenre)
-				# print(model_to_dict(genre.bandgenre))
-				# print(model_to_dict(user.bandmember)["user_id"]["id"])
 
 				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
 				user.id = model_to_dict(user.bandmember)["id"]
@@ -341,9 +334,25 @@ class BandMember(Resource):
 		except models.BandMember.DoesNotExist:
 			abort(404)
 
+class BandMemberDelete(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## delete member of band -- WORKING
+	def delete(self, bm_id):
+		band_member_to_delete = models.BandMember.get_or_none(models.BandMember.id == bm_id)
+		if band_member_to_delete:
+			band_member_to_delete.delete_instance()
+			return ("band member deleted", 200)
+		else:
+			abort(404)
+
+
+
 	# 'id': fields.String,
 	# 'user_id': fields.String,
 	# 'band_id': fields.String,
+	# 'band_name': fields.String,
 	# 'name': fields.String,
 	# 'email': fields.String,
 	# 'active': fields.Boolean
@@ -423,11 +432,11 @@ api.add_resource(
 	endpoint="band_member"
 	)
 
-# api.add_resource(
-# 	BandMemberDelete,
-# 	'/bands/member/<int:bg_id>/delete',
-# 	endpoint="band_member_delete"
-# 	)
+api.add_resource(
+	BandMemberDelete,
+	'/bands/member/<int:bm_id>/delete',
+	endpoint="band_member_delete"
+	)
 
 
 
