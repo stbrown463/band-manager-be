@@ -348,19 +348,11 @@ class BandMemberDelete(Resource):
 			abort(404)
 
 
+	## Todo
+	# get all shows of band by b_id
 
-	# 'id': fields.String,
-	# 'user_id': fields.String,
-	# 'band_id': fields.String,
-	# 'band_name': fields.String,
-	# 'name': fields.String,
-	# 'email': fields.String,
-	# 'active': fields.Boolean
-
-
-
-
-	# Confirm User As Member
+	# Confirm User As Member -- done
+	# Change Active status of band member 
 
 	# Email Bands
 	## probably on front end??
@@ -437,6 +429,7 @@ api.add_resource(
 	'/bands/member/<int:bm_id>/delete',
 	endpoint="band_member_delete"
 	)
+
 
 
 

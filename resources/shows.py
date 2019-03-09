@@ -6,7 +6,7 @@ from playhouse.shortcuts import model_to_dict, dict_to_model
 import models
 import datetime
 
-show_fields= {
+show_fields = {
 	'id': fields.Integer,
 	'date': fields.DateTime,
 	'loadIn': fields.DateTime,
@@ -15,6 +15,18 @@ show_fields= {
 	'poster_url': fields.String,       
 	'venue': fields.String
 }
+
+band_show_fields = {
+	'id': fields.String,
+	'show_id': fields.String,
+	'venue_name': fields.String,
+	'band_id': fields.String,
+	'band_img_url': fields.String,
+	'band_name': fields.String,
+	'email': fields.String,
+}
+
+########## SHOW CRUD ROUTES #######################
 
 class ShowsNew(Resource):
 	def __init__(self):
@@ -159,6 +171,55 @@ class Show(Resource):
 		else:
 			abort(404)
 
+######## BAND SHOW ROUTES ###############################
+
+class BandShowNew(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'show_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'band_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+
+	def post(self):
+		try:
+			args = self.reqparse.parse_args()
+			print(args, 'hittingggg ')
+			bandshow = models.BandShow.get_or_create(**args)
+			print(bandshow[1])
+			if bandshow:
+				return (marshal(bandshow[0], band_show_fields), 200)
+			else: 
+				return (marshal(bandshow[0], band_show_fields), 403)
+		except models.BandShow.DoesNotExist:
+			return 404
+
+	# 'id': fields.String,
+	# 'show_id': fields.String,
+	# 'venue_name': fields.String,
+	# 'band_id': fields.String,
+	# 'band_img_url', field.String,
+	# 'band_name': fields.String,
+	# 'email': fields.String,
+
+
+
+	### To do 
+
+	# Search shows by band id or venue it
+
+	# Add band of show
+	# Delete band from show == show creator or band member
+	# View bands of show
+
 
 shows_api = Blueprint('resources.shows', __name__)
 api = Api(shows_api)
@@ -193,3 +254,33 @@ api.add_resource(
 # 	'/shows/search',
 # 	endpoint="show_search"
 # 	)
+
+####### BAND SHOW ENDPOINTS ##########
+
+api.add_resource(
+	BandShowNew,
+	'/shows/band/new',
+	endpoint="show_band_new"
+	)
+
+# api.add_resource(
+# 	BandShow,
+# 	'/shows/band/<int:show_id>',
+# 	endpoint="show_bands"
+# 	)
+
+# api.add_resource(
+# 	BandShowDelete,
+# 	'/shows/band/<int:bs_id>/delete',
+# 	endpoint="show_band_delete"
+# 	)
+
+
+
+
+
+
+
+
+
+

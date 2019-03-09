@@ -130,6 +130,15 @@ class BandMember(Model):
 	class Meta:
 		database = DATABASE
 
+class BandShow(Model):
+	band_id = ForeignKeyField(Band)
+	show_id = ForeignKeyField(Show)
+
+	class Meta:
+		database = DATABASE
+
+
+
 
 def initialize():
 	DATABASE.connect()
