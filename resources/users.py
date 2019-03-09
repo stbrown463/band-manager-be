@@ -2,6 +2,7 @@ import json
 from flask import jsonify, Blueprint, abort, make_response
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, url_for
+from playhouse.shortcuts import model_to_dict, dict_to_model
 
 from flask_login import login_user, logout_user
 
@@ -16,6 +17,16 @@ user_fields = {
 	'bio': fields.String,
 	'city': fields.String,
 	'state': fields.String
+}
+
+band_member_fields = {
+	'id': fields.String,
+	'user_id': fields.String,
+	'name': fields.String,
+	'band_id': fields.String,
+	'band_name': fields.String,
+	'email': fields.String,
+	'active': fields.Boolean
 }
 
 
@@ -135,6 +146,36 @@ class UserLogin(Resource):
 						"error": "User password was incorrectly entered. Please enter the correct password."
 					}), 400)
 
+
+class UserBands(Resource):
+	def __init__(self):
+		super().__init__()
+
+	### Get bands of user
+	def get(self, u_id):
+		print(u_id)
+		print('hitting')
+		try:
+
+			U = models.User.alias()
+			BM = models.BandMember.alias()
+
+			users = U.select().join(BM).select(BM.id, BM.user_id, BM.band_id, BM.active, U.name, U.email).where(BM.user_id == u_id)		## good enough for now... move
+
+			for user in users:
+				print(user.__dict__)
+				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
+				user.id = model_to_dict(user.bandmember)["id"]
+				user.user_id = model_to_dict(user.bandmember)["user_id"]["id"]
+				user.band_id = model_to_dict(user.bandmember)["band_id"]["id"]
+				user.band_name = model_to_dict(user.bandmember)["band_id"]["name"]
+				user.active = model_to_dict(user.bandmember)["active"]
+				######################################################################
+
+			return ([marshal(user, band_member_fields) for user in users], 200)
+		except models.BandMember.DoesNotExist:
+			abort(404)
+
 	
 
 users_api = Blueprint('resources.users', __name__)
@@ -152,3 +193,8 @@ api.add_resource(
 	endpoint='login'
 	)
 
+api.add_resource(
+	UserBands,
+	'/users/bands/<int:u_id>',
+	endpoint='user_bands'
+	)
