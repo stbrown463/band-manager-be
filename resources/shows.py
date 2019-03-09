@@ -19,7 +19,6 @@ show_fields = {
 band_show_fields = {
 	'id': fields.String,
 	'show_id': fields.String,
-	'venue_name': fields.String,
 	'band_id': fields.String,
 	'band_img_url': fields.String,
 	'band_name': fields.String,
@@ -173,22 +172,23 @@ class Show(Resource):
 
 ######## BAND SHOW ROUTES ###############################
 
-class BandShowNew(Resource):
+class BandShowNew(Resource): #### not working yet
 	def __init__(self):
 	  self.reqparse = reqparse.RequestParser()
-	  self.reqparse.add_argument(
-	    'show_id',
-	    required=True,
-	    help='No id provided',
-	    location=['form', 'json']
-	  )
 	  self.reqparse.add_argument(
 	    'band_id',
 	    required=True,
 	    help='No id provided',
 	    location=['form', 'json']
 	  )
+	  self.reqparse.add_argument(
+	    'show_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
 
+	## Add band to a show  --- working
 	def post(self):
 		try:
 			args = self.reqparse.parse_args()
@@ -202,9 +202,38 @@ class BandShowNew(Resource):
 		except models.BandShow.DoesNotExist:
 			return 404
 
+class BandShow(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## view bands of show -- WORKING
+	def get(self, s_id):
+		print('hitting')
+		try:
+
+			S = models.Show.alias()
+			BS = models.BandShow.alias()
+
+			shows = S.select().join(BS, on=(BS.show_id == S.id)).select(S.id, BS.id, BS.band_id).where(BS.show_id == s_id)
+
+			for show in shows:
+				print(show.__dict__)
+
+				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
+				show.show_id = model_to_dict(show)["id"]
+				show.id = model_to_dict(show.bandshow)["id"]
+				show.band_id = model_to_dict(show.bandshow)["band_id"]["id"]
+				show.band_name = model_to_dict(show.bandshow)["band_id"]["name"]
+				show.band_img_url = model_to_dict(show.bandshow)["band_id"]["img_url"]
+				show.email = model_to_dict(show.bandshow)["band_id"]["email"]
+				######################################################################
+
+			return ([marshal(show, band_show_fields) for show in shows], 200)
+		except models.BandShow.DoesNotExist:
+			abort(404)
+
 	# 'id': fields.String,
 	# 'show_id': fields.String,
-	# 'venue_name': fields.String,
 	# 'band_id': fields.String,
 	# 'band_img_url', field.String,
 	# 'band_name': fields.String,
@@ -263,11 +292,11 @@ api.add_resource(
 	endpoint="show_band_new"
 	)
 
-# api.add_resource(
-# 	BandShow,
-# 	'/shows/band/<int:show_id>',
-# 	endpoint="show_bands"
-# 	)
+api.add_resource(
+	BandShow,
+	'/shows/band/<int:s_id>',
+	endpoint="show_bands"
+	)
 
 # api.add_resource(
 # 	BandShowDelete,

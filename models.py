@@ -142,7 +142,7 @@ class BandShow(Model):
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User, Connection, BandMember], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User, Connection, BandMember, BandShow], safe=True)
 	DATABASE.close()
 
 
