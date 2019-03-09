@@ -122,10 +122,18 @@ class Connection(Model):
 	class Meta:
 		database = DATABASE
 
+class BandMember(Model):
+	user_id = ForeignKeyField(User)
+	band_id = ForeignKeyField(Band)
+	active = BooleanField(default=True)
+
+	class Meta:
+		database = DATABASE
+
 
 def initialize():
 	DATABASE.connect()
-	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User, Connection], safe=True)
+	DATABASE.create_tables([Band, Genre, BandGenre, Venue, Contact, Show, User, Connection, BandMember], safe=True)
 	DATABASE.close()
 
 

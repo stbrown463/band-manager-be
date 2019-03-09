@@ -33,6 +33,15 @@ genre_fields = {
 	'name': fields.String
 }
 
+band_member_fields = {
+	'id': fields.String,
+	'user_id': fields.String,
+	'contact_id': fields.String,
+	'name': fields.String,
+	'email': fields.String,
+	'active': fields.Boolean
+}
+
 
 
 
@@ -189,6 +198,8 @@ class BandSearch(Resource):
 
 ################## THROUGH TABLE ROUTES ##########################
 
+############ BAND GENRE ROUTES ####################
+
 class BandGenreNew(Resource):
 	def __init__(self):
 		super().__init__()
@@ -249,8 +260,6 @@ class BandGenre(Resource):
 		except models.BandGenre.DoesNotExist:
 			abort(404)
 
-
-	
 class BandGenreDelete(Resource):
 	def __init__(self):
 		super().__init__()
@@ -264,7 +273,33 @@ class BandGenreDelete(Resource):
 		else:
 			abort(404)
 
+############ BAND MEMBER ROUTES ########################
 
+class BandMemberNew(Resource):
+	def __init__(self):
+	  self.reqparse = reqparse.RequestParser()
+	  self.reqparse.add_argument(
+	    'user_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+	  self.reqparse.add_argument(
+	    'band_id',
+	    required=True,
+	    help='No id provided',
+	    location=['form', 'json']
+	  )
+
+	def post(self):
+		args = self.reqparse.parse_args()
+		print(args, 'hittingggg ')
+		bandmember = models.BandMember.get_or_create(**args)
+		print(bandmember[1])
+		if bandmember[1]:
+			return (marshal(bandmember[0], band_member_fields), 200)
+		else: 
+			return (marshal(bandmember[0], band_member_fields), 403)
 
 
 	# Confirm User As Member
@@ -305,6 +340,8 @@ api.add_resource(
 	endpoint="band_search"
 	)
 
+########## BAND GENRE ENDPOINTS #############
+
 api.add_resource(
 	BandGenreNew,
 	'/bands/genre/new',
@@ -323,7 +360,25 @@ api.add_resource(
 	endpoint="band_genre_delete"
 	)
 
+########## BAND MEMBER ENDPOINTS ##############
 
+api.add_resource(
+	BandMemberNew,
+	'/bands/member/new',
+	endpoint="band_member_new"
+	)
+
+# api.add_resource(
+# 	BandMember,
+# 	'/bands/member/<int:b_id>',
+# 	endpoint="band_member"
+# 	)
+
+# api.add_resource(
+# 	BandMemberDelete,
+# 	'/bands/member/<int:bg_id>/delete',
+# 	endpoint="band_member_delete"
+# 	)
 
 
 
