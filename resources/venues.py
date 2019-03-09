@@ -273,7 +273,7 @@ class VenueContact(Resource):
 	def __init__(self):
 		super().__init__()
 
-	## view bands of show -- WORKING
+	## view contacts or users of venue -- WORKING
 	def get(self, v_id):
 		print('hitting')
 		try:
@@ -304,17 +304,20 @@ class VenueContact(Resource):
 		except models.VenueContact.DoesNotExist:
 			abort(404)
 
-# venue_contact_fields = {
-# 	'id': fields.Integer,
-# 	'venue_id': fields.String,
-# 	'user_id': fields.String,
-# 	'user_name': fields.String,
-# 	'user_email': fields.String,
-# 	'contact_id': fields.String,
-# 	'contact_name': fields.String,
-# 	'contact_email': fields.String,
-# 	'active': fields.Boolean
-# }
+class VenueContactDelete(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## delete contact of venue -- WORKING
+	def delete(self, vc_id):
+		venuecontact_to_delete = models.VenueContact.get_or_none(models.VenueContact.id == vc_id)
+		if venuecontact_to_delete:
+			venuecontact_to_delete.delete_instance()
+			return ("venuecontact deleted", 200)
+		else:
+			abort(404)
+
+
 
 
 
@@ -327,7 +330,8 @@ class VenueContact(Resource):
 	# Search Venue -- done
 	# Add contact of venue -- done
 	# View contacts of venue -- done
-	# Change active status --
+	# Delete contacts of venue -- done
+	# Change active status -- need a way to send boolean through postman.. wait for react
 
 
 
@@ -379,9 +383,9 @@ api.add_resource(
 	endpoint="venue_contact"
 	)
 
-# api.add_resource(
-# 	VenueContactEdit,
-# 	'/venues/contact/<int:vc_id>/edit',
-# 	endpoint="venue_contact_edit"
-# 	)
+api.add_resource(
+	VenueContactDelete,
+	'/venues/contact/<int:vc_id>/delete',
+	endpoint="venue_contact_delete"
+	)
 
