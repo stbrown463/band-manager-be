@@ -146,6 +146,13 @@ class UserLogin(Resource):
 						"error": "User password was incorrectly entered. Please enter the correct password."
 					}), 400)
 
+class UserLogout(Resource):
+	def __init__(self):
+		super().__init__()
+
+	def get(self):
+		logout_user()
+		return ("user has logged out", 200)
 
 class UserBands(Resource):
 	def __init__(self):
@@ -198,3 +205,10 @@ api.add_resource(
 	'/users/bands/<int:u_id>',
 	endpoint='user_bands'
 	)
+
+api.add_resource(
+	UserLogout,
+	'/users/logout',
+	endpoint='user_logout'
+	)
+
