@@ -202,7 +202,7 @@ class BandShowNew(Resource): #### not working yet
 		except models.BandShow.DoesNotExist:
 			return 404
 
-class BandShow(Resource):
+class ShowBands(Resource):
 	def __init__(self):
 		super().__init__()
 
@@ -232,13 +232,50 @@ class BandShow(Resource):
 		except models.BandShow.DoesNotExist:
 			abort(404)
 
-  ### return fields
-	# 'id': fields.String,
-	# 'show_id': fields.String,
-	# 'band_id': fields.String,
-	# 'band_img_url', field.String,
-	# 'band_name': fields.String,
-	# 'email': fields.String,
+class BandShows(Resource):
+	def __init__(self):
+		super().__init__()
+
+	## view shows of band -- WORKING
+	def get(self, b_id):
+		print('hitting')
+		try:
+
+			S = models.Show.alias()
+			BS = models.BandShow.alias()
+
+			shows = S.select().join(BS, on=(BS.show_id == S.id)).select(S.id, BS.id, BS.band_id).where(BS.band_id == b_id)
+
+			for show in shows:
+				print(show.__dict__)
+
+				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
+				show.show_id = model_to_dict(show)["id"]
+				show.id = model_to_dict(show.bandshow)["id"]
+				if model_to_dict(show.bandshow)["show_id"]["venue_id"]:
+					show.band_id = model_to_dict(show.bandshow)["show_id"]["venue_id"]["id"]
+					show.band_name = model_to_dict(show.bandshow)["show_id"]["venue_id"]["name"]
+				show.band_img_url = model_to_dict(show.bandshow)["band_id"]["img_url"]
+				show.email = model_to_dict(show.bandshow)["band_id"]["email"]
+				######################################################################
+
+			return ([marshal(show, show_fields) for show in shows], 200)
+		except models.BandShow.DoesNotExist:
+			abort(404)
+
+# show_fields = {
+# 	'id': fields.Integer,
+# 	'date': fields.DateTime,
+# 	'loadIn': fields.DateTime,
+# 	'doors': fields.DateTime,
+# 	'notes': fields.String,
+# 	'poster_url': fields.String,       
+# 	'venue': fields.String
+# }
+
+
+
+
 
 class BandShowDelete(Resource):
 	def __init__(self):
@@ -307,8 +344,8 @@ api.add_resource(
 	)
 
 api.add_resource(
-	BandShow,
-	'/shows/band/<int:s_id>',
+	ShowBands,
+	'/shows/bands/<int:s_id>',
 	endpoint="show_bands"
 	)
 
@@ -318,6 +355,11 @@ api.add_resource(
 	endpoint="show_band_delete"
 	)
 
+api.add_resource(
+	BandShows,
+	'/shows/band/<int:b_id>',
+	endpoint="band_shows"
+	)
 
 
 
