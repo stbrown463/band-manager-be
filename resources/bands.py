@@ -182,9 +182,10 @@ class BandSearch(Resource):
 
 	## Band search == working for name and city
 	def get(self):
-		if(request.args.get('city')):
+		if(request.args.get('city' and 'name')):
 			city = request.args.get('city')
-			bands = models.Band.select().where(models.Band.city ** f'%{city}%') 
+			name = request.args.get('name')
+			bands = models.Band.select().where(models.Band.city ** f'%{city}%' and models.Band.name ** f'%{name}%') 
 			if (bands):
 				return ([marshal(band, band_fields) for band in bands], 200)
 			else:
@@ -196,6 +197,14 @@ class BandSearch(Resource):
 				return ([marshal(band, band_fields) for band in bands], 200)
 			else:
 				return 404
+		if(request.args.get('city')):
+			city = request.args.get('city')
+			bands = models.Band.select().where(models.Band.city ** f'%{city}%') 
+			if (bands):
+				return ([marshal(band, band_fields) for band in bands], 200)
+			else:
+				return 404
+
 
 ################## THROUGH TABLE ROUTES ##########################
 

@@ -8,12 +8,13 @@ import datetime
 
 show_fields = {
 	'id': fields.Integer,
+	'bandshow_id': fields.String,
 	'date': fields.DateTime,
 	'loadIn': fields.DateTime,
 	'doors': fields.DateTime,
 	'notes': fields.String,
 	'poster_url': fields.String,       
-	'venue': fields.String
+	'venue': fields.String,
 }
 
 band_show_fields = {
@@ -23,6 +24,23 @@ band_show_fields = {
 	'band_img_url': fields.String,
 	'band_name': fields.String,
 	'email': fields.String,
+}
+
+show_venue_fields = {
+	'id': fields.Integer,
+	'bandshow_id': fields.String,
+	'date': fields.DateTime,
+	'loadIn': fields.DateTime,
+	'doors': fields.DateTime,
+	'notes': fields.String,
+	'poster_url': fields.String,
+	'venue_id': fields.String,
+	'venue_name': fields.String,
+	'email': fields.String,
+	'streetAddress':fields.String,
+	'zipcode': fields.String,
+	'city': fields.String,
+	'state': fields.String
 }
 
 ########## SHOW CRUD ROUTES #######################
@@ -243,34 +261,46 @@ class BandShows(Resource):
 
 			S = models.Show.alias()
 			BS = models.BandShow.alias()
+			V = models.Venue.alias()
 
-			shows = S.select().join(BS, on=(BS.show_id == S.id)).select(S.id, BS.id, BS.band_id).where(BS.band_id == b_id)
+			# shows = S.select().join(BS, on=(BS.show_id == S.id)).join(V, on=(V.id == S.venue)).select(S, BS.id).where(BS.band_id == b_id)
+
+			shows = S.select(S, V, BS).join(BS, on=(BS.show_id == S.id)).switch(S).join(V).where(BS.band_id == b_id)
 
 			for show in shows:
 				print(show.__dict__)
+				print(model_to_dict(show.venue))
 
 				#### THIS ALLOWS YOU TO RETURN DATA FROM MULTIPLE TABLES IN ONE DICTIONARY
-				show.show_id = model_to_dict(show)["id"]
-				show.id = model_to_dict(show.bandshow)["id"]
-				if model_to_dict(show.bandshow)["show_id"]["venue_id"]:
-					show.band_id = model_to_dict(show.bandshow)["show_id"]["venue_id"]["id"]
-					show.band_name = model_to_dict(show.bandshow)["show_id"]["venue_id"]["name"]
-				show.band_img_url = model_to_dict(show.bandshow)["band_id"]["img_url"]
-				show.email = model_to_dict(show.bandshow)["band_id"]["email"]
+				show.bandshow_id = model_to_dict(show.bandshow)["id"]
+				show.venue_id = model_to_dict(show.venue)["id"]
+				show.venue_name = model_to_dict(show.venue)["name"]
+				show.email = model_to_dict(show.venue)["email"]
+				show.streetAddress = model_to_dict(show.venue)["streetAddress"]
+				show.zipcode = model_to_dict(show.venue)["zipcode"]
+				show.city = model_to_dict(show.venue)["city"]
+				show.state = model_to_dict(show.venue)["state"]
 				######################################################################
 
-			return ([marshal(show, show_fields) for show in shows], 200)
+			return ([marshal(show, show_venue_fields) for show in shows], 200)
 		except models.BandShow.DoesNotExist:
 			abort(404)
 
-# show_fields = {
+# show_venue_fields = {
 # 	'id': fields.Integer,
+# 	'bandshow_id': fields.String,
 # 	'date': fields.DateTime,
 # 	'loadIn': fields.DateTime,
 # 	'doors': fields.DateTime,
 # 	'notes': fields.String,
-# 	'poster_url': fields.String,       
-# 	'venue': fields.String
+# 	'poster_url': fields.String,
+# 	'venue_id': fields.String,
+# 	'venue_name': fields.String,
+# 	'email': fields.String,
+# 	'streetAddress':fields.String,
+# 	'zipcode': fields.String,
+# 	'city': fields.String,
+# 	'state': fields.String,
 # }
 
 
