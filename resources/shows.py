@@ -5,6 +5,7 @@ from playhouse.shortcuts import model_to_dict, dict_to_model
 
 import models
 import datetime
+import time
 
 show_fields = {
 	'id': fields.Integer,
@@ -95,9 +96,18 @@ class ShowsNew(Resource):
 
 		args = self.reqparse.parse_args()
 		print(args, 'hittingggg ')
-		args.date = datetime.datetime.strptime(args.date, "%Y%m%d%H%M")
-		args.loadIn = datetime.datetime.strptime(args.loadIn, "%Y%m%d%H%M" )
-		args.doors = datetime.datetime.strptime(args.doors, "%Y%m%d%H%M" )
+
+			## date format from react
+			# date: "2019-09-04T20:30"
+			# doors: "20:00"
+			# loadIn: "18:00"
+			# datetime.strptime('07/28/2014 18:54:55.099000', '%m/%d/%Y %H:%M:%S.%f')
+			# datetime.datetime(2014, 7, 28, 18, 54, 55, 99000)
+
+
+		args.date = datetime.datetime.strptime(args.date, '%Y-%m-%dT%H:%M')
+		args.loadIn = datetime.datetime.strptime(args.loadIn, '%Y-%m-%dT%H:%M')
+		args.doors = datetime.datetime.strptime(args.doors, '%Y-%m-%dT%H:%M')
 		print(args.date.strftime('%B, %d %Y'))
 		print(args.loadIn.strftime('%H:%M'))
 		print(args.doors.strftime('%H:%M'))
@@ -149,9 +159,18 @@ class ShowEdit(Resource):
 	def put(self, s_id):
 		try:
 			args = self.reqparse.parse_args()
-			args.date = datetime.datetime.strptime(args.date, "%Y%m%d%H%M")
-			args.loadIn = datetime.datetime.strptime(args.loadIn, "%Y%m%d%H%M" )
-			args.doors = datetime.datetime.strptime(args.doors, "%Y%m%d%H%M" )
+
+			## date format from react
+			# date: "2019-09-04T20:30"
+			# doors: "20:00"
+			# loadIn: "18:00"
+			# datetime.strptime('07/28/2014 18:54:55.099000', '%m/%d/%Y %H:%M:%S.%f')
+			# datetime.datetime(2014, 7, 28, 18, 54, 55, 99000)
+			# '2017-05-15T09:10:23.000-04:00'
+
+			args.date = datetime.datetime.strptime(f'{args.date}', '%Y-%m-%dT%H:%M%S.%f%z')
+			args.loadIn = datetime.datetime.strptime(args.loadIn, '%Y-%m-%dT%H:%M%S.%f%z' )
+			args.doors = datetime.datetime.strptime(args.doors, '%Y-%m-%dT%H:%M%S.%f%z' )
 			print(args, 'hittingggg ')
 			query = models.Show.update(**args).where(models.Show.id==s_id)
 			query.execute()
