@@ -23,6 +23,9 @@ band_show_fields = {
 	'band_id': fields.String,
 	'band_img_url': fields.String,
 	'band_name': fields.String,
+	'band_city': fields.String,
+	'band_state': fields.String,
+	'band_website': fields.String,
 	'email': fields.String,
 }
 
@@ -244,7 +247,11 @@ class ShowBands(Resource):
 				show.band_name = model_to_dict(show.bandshow)["band_id"]["name"]
 				show.band_img_url = model_to_dict(show.bandshow)["band_id"]["img_url"]
 				show.email = model_to_dict(show.bandshow)["band_id"]["email"]
+				show.band_website = model_to_dict(show.bandshow)["band_id"]["website"]
+				show.band_city = model_to_dict(show.bandshow)["band_id"]["city"]
+				show.band_state = model_to_dict(show.bandshow)["band_id"]["state"]
 				######################################################################
+
 
 			return ([marshal(show, band_show_fields) for show in shows], 200)
 		except models.BandShow.DoesNotExist:
@@ -265,7 +272,7 @@ class BandShows(Resource):
 
 			# shows = S.select().join(BS, on=(BS.show_id == S.id)).join(V, on=(V.id == S.venue)).select(S, BS.id).where(BS.band_id == b_id)
 
-			shows = S.select(S, V, BS).join(BS, on=(BS.show_id == S.id)).switch(S).join(V).where(BS.band_id == b_id)
+			shows = S.select(S, V, BS).join(BS, on=(BS.show_id == S.id)).switch(S).join(V).where(BS.band_id == b_id).order_by(S.date.asc())
 
 			for show in shows:
 				print(show.__dict__)
@@ -285,27 +292,6 @@ class BandShows(Resource):
 			return ([marshal(show, show_venue_fields) for show in shows], 200)
 		except models.BandShow.DoesNotExist:
 			abort(404)
-
-# show_venue_fields = {
-# 	'id': fields.Integer,
-# 	'bandshow_id': fields.String,
-# 	'date': fields.DateTime,
-# 	'loadIn': fields.DateTime,
-# 	'doors': fields.DateTime,
-# 	'notes': fields.String,
-# 	'poster_url': fields.String,
-# 	'venue_id': fields.String,
-# 	'venue_name': fields.String,
-# 	'email': fields.String,
-# 	'streetAddress':fields.String,
-# 	'zipcode': fields.String,
-# 	'city': fields.String,
-# 	'state': fields.String,
-# }
-
-
-
-
 
 class BandShowDelete(Resource):
 	def __init__(self):
