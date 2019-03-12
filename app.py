@@ -31,13 +31,13 @@ def load_user(userid):
 	except models.DoesNotExist:
 		return none
 
-CORS(users_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
-CORS(bands_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
-CORS(genres_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
-CORS(venues_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
-CORS(contacts_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
-CORS(shows_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
-CORS(connections_api, origins=["Heroku FE link here", "http://localhost:3000"], supports_credentials=True)
+CORS(users_api, origins=["https://band-manager-react.herokuapp.com", "http://localhost:3000"], supports_credentials=True)
+CORS(bands_api, origins=["https://band-manager-react.herokuapp.com", "http://localhost:3000"], supports_credentials=True)
+CORS(genres_api, origins=["https://band-manager-react.herokuapp.com", "http://localhost:3000"], supports_credentials=True)
+CORS(venues_api, origins=["https://band-manager-react.herokuapp.com", "http://localhost:3000"], supports_credentials=True)
+CORS(contacts_api, origins=["https://band-manager-react.herokuapp.com", "http://localhost:3000"], supports_credentials=True)
+CORS(shows_api, origins=["https://band-manager-react.herokuapp.com", "http://localhost:3000"], supports_credentials=True)
+CORS(connections_api, origins=["https://band-manager-react.herokuapp.com", "http://localhost:3000"], supports_credentials=True)
 
 
 app.register_blueprint(users_api, url_prefix='/api/v1')
@@ -52,7 +52,6 @@ app.register_blueprint(connections_api, url_prefix='/api/v1')
 @app.route('/')
 def hello_world():
     return 'Hello World'
-
 
 
 if 'HEROKU' in os.environ:
