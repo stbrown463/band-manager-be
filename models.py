@@ -1,16 +1,29 @@
 from peewee import *
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from playhouse.db_url import connect
 
 import datetime
+import os
+
+if 'HEROKU' in os.environ:
+	DATABASE = connect(os.environ.get('DATABASE_URL'))
+	# db_proxy.initialize(db)
+else:
+	DATABASE = SqliteDatabase('band-manager.sqlite')
+	## uncomment below if you want to use postgress locally
+
+	# DATABASE = PostgresqlDatabase(
+	#   "band_manager",
+	#   user="sam",
+	#   password="asdf"
+	#   )
 
 
-DATABASE = SqliteDatabase('band-manager.sqlite')
-# DATABASE = PostgresqlDatabase(
-#   "band-manager",
-#   user="sam",
-#   password="asdf"
-#   )
+
+
+
+
 
 
 class User(UserMixin, Model):
