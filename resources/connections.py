@@ -110,7 +110,7 @@ class ConnectionBB(Resource):
 			B = models.Band.alias()
 			C = models.Connection.alias()
 
-			bands = B.select().join(C, on=(C.other_band_id == B.id)).select(B.id, B.name, B.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id)		## good enough for now... move
+			bands = B.select().join(C, on=(C.other_band_id == B.id)).select(B.id, B.name, B.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for band in bands:
 
@@ -219,7 +219,7 @@ class ConnectionBV(Resource):
 			V = models.Venue.alias()
 			C = models.Connection.alias()
 
-			venues = V.select().join(C, on=(C.venue_id == V.id)).select(V.id, V.name, V.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id)		## good enough for now... move
+			venues = V.select().join(C, on=(C.venue_id == V.id)).select(V.id, V.name, V.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for venue in venues:
 
@@ -330,7 +330,7 @@ class ConnectionBC(Resource):
 			P = models.Contact.alias()
 			C = models.Connection.alias()
 
-			contacts = P.select().join(C, on=(C.contact_id == P.id)).select(P.id, P.name, P.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id)		## good enough for now... move
+			contacts = P.select().join(C, on=(C.contact_id == P.id)).select(P.id, P.name, P.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for contact in contacts:
 
@@ -441,7 +441,7 @@ class ConnectionBU(Resource):
 			U = models.User.alias()
 			C = models.Connection.alias()
 
-			users = U.select().join(C, on=(C.user_id == U.id)).select(U.id, U.name, U.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id)		## good enough for now... move
+			users = U.select().join(C, on=(C.user_id == U.id)).select(U.id, U.name, U.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for user in users:
 
