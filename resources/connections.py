@@ -21,7 +21,9 @@ band_venue_fields = {
 	'venue_id': fields.String,
 	'notes': fields.String,
 	'timesConnected': fields.String,
-	'active': fields.Boolean
+	'active': fields.Boolean,
+	'city': fields.String,
+	'state': fields.String
 }
 
 band_contact_fields = {
@@ -30,7 +32,9 @@ band_contact_fields = {
 	'contact_id': fields.String,
 	'notes': fields.String,
 	'timesConnected': fields.String,
-	'active': fields.Boolean
+	'active': fields.Boolean,
+	'city': fields.String,
+	'state': fields.String
 }
 
 band_user_fields = {
@@ -39,7 +43,9 @@ band_user_fields = {
 	'my_band_id': fields.String,
 	'notes': fields.String,
 	'timesConnected': fields.String,
-	'active': fields.Boolean
+	'active': fields.Boolean,
+	'city': fields.String,
+	'state': fields.String
 }
 
 connection_fields = {
@@ -49,7 +55,9 @@ connection_fields = {
 	'email': fields.String,
 	'notes': fields.String,
 	'timesConnected': fields.String,
-	'active': fields.Boolean
+	'active': fields.Boolean,
+	'city': fields.String,
+	'state': fields.String
 }
 
 ## should be in venues controller
@@ -110,7 +118,7 @@ class ConnectionBB(Resource):
 			B = models.Band.alias()
 			C = models.Connection.alias()
 
-			bands = B.select().join(C, on=(C.other_band_id == B.id)).select(B.id, B.name, B.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
+			bands = B.select().join(C, on=(C.other_band_id == B.id)).select(B.id, B.name, B.email, B.city, B.state, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for band in bands:
 
@@ -219,7 +227,7 @@ class ConnectionBV(Resource):
 			V = models.Venue.alias()
 			C = models.Connection.alias()
 
-			venues = V.select().join(C, on=(C.venue_id == V.id)).select(V.id, V.name, V.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
+			venues = V.select().join(C, on=(C.venue_id == V.id)).select(V.id, V.name, V.email, V.state, V.city, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for venue in venues:
 
@@ -228,6 +236,7 @@ class ConnectionBV(Resource):
 				venue.notes = model_to_dict(venue.connection)["notes"]
 				venue.timesConnected = model_to_dict(venue.connection)["timesConnected"]
 				venue.active = model_to_dict(venue.connection)["active"]
+
 				######################################################################
 				print(venue.__dict__)
 
@@ -330,7 +339,7 @@ class ConnectionBC(Resource):
 			P = models.Contact.alias()
 			C = models.Connection.alias()
 
-			contacts = P.select().join(C, on=(C.contact_id == P.id)).select(P.id, P.name, P.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
+			contacts = P.select().join(C, on=(C.contact_id == P.id)).select(P.id, P.name, P.email, P.city, P.state, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for contact in contacts:
 
@@ -441,7 +450,7 @@ class ConnectionBU(Resource):
 			U = models.User.alias()
 			C = models.Connection.alias()
 
-			users = U.select().join(C, on=(C.user_id == U.id)).select(U.id, U.name, U.email, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
+			users = U.select().join(C, on=(C.user_id == U.id)).select(U.id, U.name, U.email, U.city, U.state, C.notes, C.id, C.timesConnected, C.active).where(C.my_band_id == b_id).order_by(C.timesConnected.desc())		## good enough for now... move
 
 			for user in users:
 
