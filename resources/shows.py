@@ -235,10 +235,10 @@ class BandShowNew(Resource): #### not working yet
 			print(args, 'hittingggg ')
 			bandshow = models.BandShow.get_or_create(**args)
 			print(bandshow[1])
-			if bandshow:
-				return (marshal(bandshow[0], band_show_fields), 200)
+			if bandshow[1]:
+				return (marshal(bandshow[0], band_show_fields), 201)
 			else: 
-				return (marshal(bandshow[0], band_show_fields), 403)
+				return (marshal(bandshow[0], band_show_fields), 200)
 		except models.BandShow.DoesNotExist:
 			return 404
 

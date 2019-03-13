@@ -94,9 +94,9 @@ class ConnectionBBNew(Resource):
 		connection = models.Connection.get_or_create(**args)
 		print(connection[1])
 		if connection[1]:
-			return (marshal(connection[0], band_band_fields), 200)
+			return (marshal(connection[0], band_band_fields), 201)
 		else: 
-			return (marshal(connection[0], band_band_fields), 403)
+			return (marshal(connection[0], band_band_fields), 200)
 
 
 class ConnectionBB(Resource):
@@ -204,9 +204,9 @@ class ConnectionBVNew(Resource):
 		connection = models.Connection.get_or_create(**args)
 		print(connection[1])
 		if connection[1]:
-			return (marshal(connection[0], band_venue_fields), 200)
+			return (marshal(connection[0], band_venue_fields), 201)
 		else: 
-			return (marshal(connection[0], band_venue_fields), 403)
+			return (marshal(connection[0], band_venue_fields), 200)
 
 class ConnectionBV(Resource):
 	def __init__(self):
@@ -278,7 +278,7 @@ class ReconnectBV(Resource):
 			connection = models.Connection.get(models.Connection.id == c_id)
 			connection.timesConnected += 1
 			connection.save()
-			return (marshal(connection, band_venue_fields), 200)
+			return (marshal(connection, band_venue_fields), 201)
 		except models.Connection.DoesNotExist:
 			return ('connection not found', 404)
 
@@ -314,9 +314,9 @@ class ConnectionBCNew(Resource):
 		connection = models.Connection.get_or_create(**args)
 		print(connection[1])
 		if connection[1]:
-			return (marshal(connection[0], band_contact_fields), 200)
+			return (marshal(connection[0], band_contact_fields), 201)
 		else: 
-			return (marshal(connection[0], band_contact_fields), 403)
+			return (marshal(connection[0], band_contact_fields), 200)
 
 
 class ConnectionBC(Resource):
@@ -390,7 +390,7 @@ class ReconnectBC(Resource):
 			connection = models.Connection.get(models.Connection.id == c_id)
 			connection.timesConnected += 1
 			connection.save()
-			return (marshal(connection, band_contact_fields), 200)
+			return (marshal(connection, band_contact_fields), 201)
 		except models.Connection.DoesNotExist:
 			return ('connection not found', 404)
 
@@ -425,9 +425,9 @@ class ConnectionBUNew(Resource):
 		connection = models.Connection.get_or_create(**args)
 		print(connection[1])
 		if connection[1]:
-			return (marshal(connection[0], band_user_fields), 200)
+			return (marshal(connection[0], band_user_fields), 201)
 		else: 
-			return (marshal(connection[0], band_user_fields), 403)
+			return (marshal(connection[0], band_user_fields), 200)
 
 
 class ConnectionBU(Resource):
@@ -501,7 +501,7 @@ class ReconnectBU(Resource):
 			connection = models.Connection.get(models.Connection.id == c_id)
 			connection.timesConnected += 1
 			connection.save()
-			return (marshal(connection, band_contact_fields), 200)
+			return (marshal(connection, band_contact_fields), 201)
 		except models.Connection.DoesNotExist:
 			return ('connection not found', 404)
 

@@ -12,18 +12,11 @@ if 'HEROKU' in os.environ:
 else:
 	DATABASE = SqliteDatabase('band-manager.sqlite')
 	## uncomment below if you want to use postgress locally
-
 	# DATABASE = PostgresqlDatabase(
 	#   "band_manager",
 	#   user="sam",
 	#   password="asdf"
 	#   )
-
-
-
-
-
-
 
 
 class User(UserMixin, Model):
