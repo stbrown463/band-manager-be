@@ -12,7 +12,9 @@ from resources.shows import shows_api
 from resources.connections import connections_api
 
 
+import logging
 import models
+import sys
 import os
 
 DEBUG = True
@@ -22,6 +24,8 @@ login_manager = LoginManager()
 app = Flask(__name__)
 app.secret_key = "lal;kjfwoi))Afl"
 login_manager.init_app(app)
+app.logger.addHandler(logging.StreamHandler(sys.stdout))
+app.logger.setLevel(logging.ERROR)
 
 
 @login_manager.user_loader
